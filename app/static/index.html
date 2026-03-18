@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diet AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&subset=latin,latin-ext&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
+</head>
+<body>
+    <header class="app-header">
+        <div class="header-left">
+            <span class="logo"><span class="mi mi-lg">nutrition</span></span>
+            <h1 data-i18n="header.title">Diet AI</h1>
+        </div>
+        <div id="header-user" class="header-user" title="Zmień użytkownika" style="display:none">
+            <span class="header-user-avatar" id="header-user-avatar">👤</span>
+            <span id="header-user-name">—</span>
+        </div>
+        <div class="header-controls">
+            <button id="btn-theme" class="btn-icon" title="Toggle theme" aria-label="Toggle dark/light theme"><span class="mi">dark_mode</span></button>
+            <button id="btn-tts" class="btn-icon" title="Read aloud" aria-label="Toggle text-to-speech"><span class="mi">volume_up</span></button>
+            <button id="btn-settings" class="btn-icon" title="Settings" aria-label="Open settings"><span class="mi">settings</span></button>
+        </div>
+    </header>
+
+    <div class="app-layout">
+
+        <!-- Lewa kolumna: Historia sesji -->
+        <aside class="history-panel" id="history-panel" aria-label="Chat history">
+            <div class="history-header">
+                <button id="btn-new-chat" class="btn-new-chat" title="New conversation"><span class="mi mi-sm">add</span> <span data-i18n="nav.new_session">New conversation</span></button>
+            </div>
+            <div id="sessions-list" class="sessions-list">
+                <p class="empty-state" data-i18n="chat.empty_state">Start a conversation with your AI dietitian.</p>
+            </div>
+        </aside>
+
+        <!-- Uchwyt do zmiany szerokości: historia | chat -->
+        <div class="resize-handle" id="resize-history"></div>
+
+        <!-- Środkowa kolumna: Chat -->
+        <section class="chat-panel" aria-label="Chat panel">
+            <div id="chat-messages" class="chat-messages" role="log" aria-live="polite">
+                <div class="message assistant-message">
+                    <div class="message-content">
+                        <p data-i18n="chat.empty_state">Start a conversation with your AI dietitian.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-input-area">
+                <div class="input-wrapper">
+                    <textarea
+                        id="message-input"
+                        class="message-input"
+                        placeholder="Ask about nutrition, meal plan, recipes..."
+                        data-i18n-placeholder="chat.placeholder"
+                        rows="1"
+                        aria-label="Message to dietitian"
+                    ></textarea>
+                    <button id="btn-mic" class="btn-icon btn-mic" title="Dictate" aria-label="Voice dictation"><span class="mi">mic</span></button>
+                </div>
+                <div class="chat-input-bar">
+                    <button id="btn-send" class="btn-send" aria-label="Send message"><span class="mi">send</span></button>
+                    <select id="chat-model-select" class="chat-model-select" title="Wybierz model AI">
+                        <option value="gemini-2.5-flash">2.5 Flash</option>
+                        <option value="gemini-2.5-flash:thinking">2.5 Flash 💭</option>
+                        <option value="gemini-2.5-pro">2.5 Pro</option>
+                        <option value="gemini-2.5-pro:thinking">2.5 Pro 💭</option>
+                        <option value="gemini-3-flash-preview">3 Flash</option>
+                        <option value="gemini-3-pro-preview">3 Pro</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <!-- Uchwyt do zmiany szerokości: chat | przepisy -->
+        <div class="resize-handle" id="resize-recipes"></div>
+
+        <!-- Prawa kolumna: Przepisy / Zakupy / Spiżarnia -->
+        <aside class="recipes-panel" id="recipes-panel" aria-label="Recipes panel">
+            <div class="panel-tabs">
+              <button class="tab-btn active" data-tab="recipes"><span class="mi mi-sm">menu_book</span> <span data-i18n="nav.recipes">Recipes</span></button>
+              <button class="tab-btn" data-tab="shopping"><span class="mi mi-sm">shopping_cart</span> <span data-i18n="nav.shopping">Shopping</span></button>
+              <button class="tab-btn" data-tab="pantry"><span class="mi mi-sm">kitchen</span> <span data-i18n="nav.pantry">Pantry</span></button>
+            </div>
+
+            <!-- Zakładka Przepisy -->
+            <div id="tab-recipes" class="tab-content">
+              <div class="recipes-content">
+                <div class="recipes-section">
+                    <h3 class="section-title">Session</h3>
+                    <div id="session-recipes" class="recipes-list">
+                        <p class="empty-state" data-i18n="recipes.empty">No recipes yet. Ask the AI to create one!</p>
+                    </div>
+                </div>
+                <hr class="recipes-separator">
+                <div class="recipes-section">
+                    <h3 class="section-title">Grocy</h3>
+<div class="recipes-controls">
+                  <select id="recipe-filter-select" class="recipe-sort-select">
+                    <option value="all" data-i18n="recipes.filter_all">All</option>
+                    <option value="sniadanie" data-i18n="recipes.filter_breakfast">Breakfast</option>
+                    <option value="obiad" data-i18n="recipes.filter_lunch">Lunch</option>
+                    <option value="kolacja" data-i18n="recipes.filter_dinner">Dinner</option>
+                    <option value="przekaska" data-i18n="recipes.filter_snack">Snack</option>
+                  </select>
+                  <select id="recipe-sort-select" class="recipe-sort-select">
+                    <option value="name" data-i18n="recipes.sort_name">Name</option>
+                    <option value="type" data-i18n="recipes.sort_type">Type</option>
+                    <option value="author" data-i18n="recipes.sort_author">Author</option>
+                  </select>
+                </div>
+                    <div id="grocy-recipes" class="recipes-list">
+                        <p class="empty-state" data-i18n="common.loading">Loading...</p>
+                    </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Zakładka Lista zakupów -->
+            <div id="tab-shopping" class="tab-content hidden">
+              <div class="add-form">
+                <div class="add-input-wrapper">
+                  <input type="text" id="shopping-input" placeholder="Product name..." data-i18n-placeholder="shopping.add_placeholder" autocomplete="off" />
+                  <div id="shopping-suggestions" class="suggestions-dropdown hidden"></div>
+                </div>
+                <input id="shopping-amount" type="number" value="1" min="0" step="0.1" class="add-amount-input" />
+                <select id="shopping-unit" class="add-unit-select">
+                  <option value="szt.">pcs.</option>
+                  <option value="g">g</option>
+                  <option value="ml">ml</option>
+                  <option value="lyzka">tbsp</option>
+                  <option value="lyzeczka">tsp</option>
+                  <option value="szczypta">pinch</option>
+                  <option value="kg">kg</option>
+                  <option value="l">l</option>
+                </select>
+                <button id="btn-shopping-add" class="btn-add">+ <span data-i18n="shopping.add_button">Add</span></button>
+              </div>
+              <div class="list-header-row">
+                <input type="text" id="shopping-search" placeholder="Search list..." data-i18n-placeholder="shopping.add_placeholder" />
+                <div class="list-filters">
+                  <button class="list-filter-btn active" data-filter="all">All</button>
+                  <button class="list-filter-btn" data-filter="pending">Pending</button>
+                  <button class="list-filter-btn" data-filter="done">Done ✓</button>
+                </div>
+                <button id="btn-shopping-refresh" class="btn-refresh">↻</button>
+              </div>
+              <div id="shopping-list" class="items-list">
+                <p class="empty-state" data-i18n="shopping.empty">Shopping list is empty.</p>
+              </div>
+              <div class="list-footer">
+                <button id="btn-complete-shopping" class="btn-complete"><span class="mi mi-sm">check_circle</span> <span data-i18n="shopping.complete_done">Move done to pantry</span></button>
+              </div>
+            </div>
+
+            <!-- Zakładka Spiżarnia -->
+            <div id="tab-pantry" class="tab-content hidden">
+              <div class="add-form">
+                <div class="add-input-wrapper">
+                  <input type="text" id="pantry-add-name" placeholder="Product name..." data-i18n-placeholder="pantry.add_placeholder" autocomplete="off" />
+                  <div id="pantry-suggestions" class="suggestions-dropdown hidden"></div>
+                </div>
+                <input id="pantry-add-amount" type="number" value="1" min="0" step="0.1" class="add-amount-input" />
+                <select id="pantry-add-unit" class="add-unit-select">
+                  <option value="szt.">pcs.</option>
+                  <option value="g">g</option>
+                  <option value="ml">ml</option>
+                  <option value="lyzka">tbsp</option>
+                  <option value="lyzeczka">tsp</option>
+                  <option value="szczypta">pinch</option>
+                  <option value="kg">kg</option>
+                  <option value="l">l</option>
+                </select>
+                <button id="btn-pantry-add" class="btn-add">+ <span data-i18n="pantry.add_button">Add</span></button>
+              </div>
+              <div class="list-header-row">
+                <input type="text" id="pantry-search" placeholder="Search pantry..." data-i18n-placeholder="pantry.add_placeholder" />
+                <div class="pantry-filters list-filters">
+                  <button class="pantry-filter-btn list-filter-btn active" data-filter="all" data-i18n="pantry.filter_all">All</button>
+                  <button class="pantry-filter-btn list-filter-btn" data-filter="have" data-i18n="pantry.filter_have">In stock ✓</button>
+                  <button class="pantry-filter-btn list-filter-btn" data-filter="missing" data-i18n="pantry.filter_missing">Missing ✗</button>
+                </div>
+                <button id="btn-pantry-refresh" class="btn-refresh">↻</button>
+              </div>
+              <div id="pantry-list" class="items-list">
+                <p class="empty-state" data-i18n="common.loading">Loading...</p>
+              </div>
+            </div>
+        </aside>
+
+    </div>
+
+    <!-- Modal ustawień — przeprojektowany v38 -->
+    <div id="modal-settings" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-label="Settings">
+        <div class="modal modal-settings-wide">
+        <div class="modal-header">
+          <h2 class="modal-title" data-i18n="settings.title">Settings</h2>
+          <button class="modal-close" id="btn-close-settings" aria-label="Close"><span class="mi">close</span></button>
+        </div>
+        <div class="modal-body">
+          <div class="settings-layout">
+            <!-- Lewa nawigacja -->
+            <nav class="settings-nav" id="settings-nav">
+              <span class="settings-nav-section" data-i18n="settings.nav_agent">Agent AI</span>
+              <button class="settings-nav-item" id="settings-nav-ai" onclick="selectSettingsSection('ai')">
+                <div class="settings-nav-item-avatar"><span class="mi" style="font-size:1.1rem">smart_toy</span></div>
+                <span data-i18n="settings.nav_agent">Agent AI</span>
+              </button>
+              <span class="settings-nav-section" data-i18n="settings.nav_users">Users</span>
+              <div id="settings-nav-users"></div>
+              <button class="settings-nav-item settings-nav-item-add" onclick="selectSettingsSection('new')">
+                <span class="mi">person_add</span>
+                <span data-i18n="settings.nav_add_user">Add user</span>
+              </button>
+              <span class="settings-nav-section" data-i18n="settings.nav_connections">Grocy</span>
+              <button class="settings-nav-item" id="settings-nav-connections" onclick="selectSettingsSection('connections')">
+                <div class="settings-nav-item-avatar"><span class="mi" style="font-size:1.1rem">cable</span></div>
+                <span data-i18n="settings.nav_connections">Grocy</span>
+              </button>
+              <div style="margin-top:auto;padding:12px 16px;border-top:1px solid var(--md-outline-variant,#3f4941)">
+                <label class="settings-label" style="font-size:0.75rem;margin-bottom:6px" data-i18n="lang.label">Language</label>
+                <div style="display:flex;gap:6px">
+                  <button class="btn-md3-outlined" style="flex:1;padding:4px 8px;font-size:0.8rem" onclick="setLanguage('en')">EN</button>
+                  <button class="btn-md3-outlined" style="flex:1;padding:4px 8px;font-size:0.8rem" onclick="setLanguage('pl')">PL</button>
+                </div>
+              </div>
+            </nav>
+
+            <!-- Prawa treść -->
+            <div class="settings-content" id="settings-content">
+
+              <!-- Panel: Agent AI -->
+              <div id="settings-panel-ai" class="settings-panel hidden">
+                <div class="settings-content-title" data-i18n="settings.agent_title">Agent AI</div>
+                <div class="settings-agent-grid">
+                  <div class="settings-agent-left">
+                    <label class="settings-label" data-i18n="settings.system_prompt_label">System Prompt</label>
+                    <p class="settings-hint">Configure AI personality. Leave empty to use the default dietitian prompt.</p>
+                    <textarea id="system-prompt-edit" class="settings-prompt-textarea" placeholder="Leave empty = default Diet AI prompt..." data-i18n-placeholder="settings.system_prompt_placeholder"></textarea>
+                    <div class="settings-prompt-actions">
+                      <button class="btn-md3-filled" id="btn-save-system-prompt"><span class="mi mi-sm">save</span> <span data-i18n="settings.save_prompt">Save prompt</span></button>
+                      <button class="btn-md3-outlined" id="btn-reset-system-prompt"><span class="mi mi-sm">restart_alt</span> Reset</button>
+                    </div>
+                  </div>
+                  <div class="settings-agent-right">
+                    <label class="settings-label" data-i18n="settings.ai_engine_label">AI Engine</label>
+                    <div class="settings-engine-options">
+                      <label class="settings-engine-card" id="radio-gemini">
+                        <input type="radio" name="ai-engine" value="gemini">
+                        <span class="mi">auto_awesome</span>
+                        <span class="settings-engine-name">Gemini API</span>
+                      </label>
+                      <label class="settings-engine-card" id="radio-ollama">
+                        <input type="radio" name="ai-engine" value="ollama">
+                        <span class="mi">computer</span>
+                        <span class="settings-engine-name">Ollama (local)</span>
+                      </label>
+                    </div>
+                    <div id="gemini-options" class="settings-engine-detail">
+                      <label class="settings-label">Gemini Model</label>
+                      <select id="gemini-model" class="md3-select">
+                        <option value="gemini-2.5-flash">2.5 Flash</option>
+                        <option value="gemini-2.5-flash:thinking">2.5 Flash Thinking</option>
+                        <option value="gemini-2.5-pro">2.5 Pro</option>
+                        <option value="gemini-2.5-pro:thinking">2.5 Pro Thinking</option>
+                        <option value="gemini-3-flash-preview">3 Flash</option>
+                        <option value="gemini-3-pro-preview">3 Pro</option>
+                      </select>
+                    </div>
+                    <!-- Gemini API Key -->
+                    <div id="settings-gemini-key-row" style="margin-top:16px">
+                      <label class="settings-label" data-i18n="settings.gemini_key_label">Gemini API Key</label>
+                      <div style="display:flex;gap:8px;align-items:center">
+                        <input type="password" id="settings-gemini-api-key"
+                          class="recipe-modal-input" style="flex:1"
+                          placeholder="AIza... (leave empty to use server env var)" />
+                        <button class="btn-md3-outlined" onclick="toggleGeminiKeyVisibility()">
+                          <span class="mi mi-sm" id="gemini-key-eye-icon">visibility</span>
+                        </button>
+                      </div>
+                      <span class="settings-hint">Optional. Overrides server GEMINI_API_KEY environment variable.</span>
+                    </div>
+                    <div id="ollama-options" class="settings-engine-detail" style="display:none">
+                      <label class="settings-label">Ollama URL</label>
+                      <input type="text" id="ollama-url" class="recipe-modal-input" value="http://192.168.1.28:11434">
+                      <label class="settings-label" style="margin-top:10px">Ollama Model</label>
+                      <select id="ollama-model" class="md3-select">
+                        <option value="">Ładowanie modeli...</option>
+                      </select>
+                      <div class="ollama-status" style="margin-top:8px">
+                        <div class="status-dot" id="ollama-status-dot"></div>
+                        <span id="ollama-status-text">Sprawdzanie...</span>
+                      </div>
+                    </div>
+                    <button class="btn-md3-filled" id="btn-save-settings" style="margin-top:16px; width:100%">
+                      <span class="mi mi-sm">save</span> <span data-i18n="settings.save">Save</span>
+                    </button>
+                    <!-- Appearance -->
+                    <div style="margin-top:20px; padding-top:16px; border-top:1px solid var(--md-outline-variant)">
+                      <label class="settings-label">Appearance</label>
+                      <div class="toggle-group">
+                        <span class="toggle-label">Light theme</span>
+                        <label class="toggle-switch">
+                          <input type="checkbox" id="toggle-theme">
+                          <span class="toggle-slider"></span>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Panel: Połączenia -->
+              <div id="settings-panel-connections" class="settings-panel hidden">
+                <div class="settings-content-title" data-i18n="settings.connections_title">Grocy Connection</div>
+
+                <label class="settings-label" data-i18n="settings.grocy_url_label">Grocy URL</label>
+                <input type="text" id="settings-grocy-url"
+                  class="recipe-modal-input" style="width:100%;margin-bottom:12px"
+                  placeholder="http://192.168.1.100:9283" />
+
+                <label class="settings-label" data-i18n="settings.grocy_key_label">Grocy API Key</label>
+                <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
+                  <input type="password" id="settings-grocy-api-key"
+                    class="recipe-modal-input" style="flex:1"
+                    placeholder="Your Grocy API key"
+                    data-i18n-placeholder="settings.grocy_key_placeholder" />
+                  <button class="btn-md3-outlined" onclick="toggleGrocyKeyVisibility()">
+                    <span class="mi mi-sm" id="grocy-key-eye-icon">visibility</span>
+                  </button>
+                </div>
+
+                <span class="settings-hint" data-i18n="settings.grocy_key_hint">Find your API key in Grocy → Manage API keys.</span>
+
+                <div style="display:flex;gap:8px;margin-top:16px">
+                  <button class="btn-md3-filled" onclick="saveConnectionSettings()">
+                    <span class="mi mi-sm">save</span> <span data-i18n="settings.save">Save</span>
+                  </button>
+                  <button class="btn-md3-outlined" onclick="testGrocyConnection()">
+                    <span class="mi mi-sm">wifi_tethering</span> <span data-i18n="settings.test_connection">Test connection</span>
+                  </button>
+                </div>
+
+                <div id="grocy-connection-status" style="margin-top:12px"></div>
+              </div>
+
+              <!-- Panel: Edytor użytkownika (edycja + nowy) -->
+              <div id="settings-panel-user" class="settings-panel hidden">
+                <div class="settings-content-title" id="settings-panel-user-title" data-i18n="settings.user_title_edit">Edit profile</div>
+                <div class="settings-user-editor-top">
+                  <input type="text" id="edit-user-name-active" class="recipe-modal-input settings-user-name-input" placeholder="User name..." data-i18n-placeholder="settings.user_name_placeholder" />
+                  <input type="text" id="edit-user-avatar-active" class="recipe-modal-input settings-user-avatar-input" placeholder="Avatar" maxlength="4" />
+                </div>
+                <label class="settings-label" style="margin-top:10px" data-i18n="settings.user_health_label">Health profile</label>
+                <textarea id="edit-user-prompt-active" class="settings-health-textarea" placeholder="Describe profile: age, weight, goal, dietary preferences..." data-i18n-placeholder="settings.user_health_placeholder"></textarea>
+                <div class="settings-user-editor-actions">
+                  <button id="settings-editor-save-btn" class="btn-md3-filled" onclick="saveActiveUserEdit()"><span class="mi mi-sm">save</span> <span data-i18n="settings.user_save">Save</span></button>
+                  <button class="btn-md3-outlined danger" id="settings-editor-delete-btn" onclick="deleteActiveUser()"><span class="mi mi-sm">delete</span> <span data-i18n="settings.user_delete">Delete</span></button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+        </div>
+    </div>
+
+    <!-- Modal wyboru użytkownika -->
+    <div id="modal-user-select" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-label="Select user">
+        <div class="modal" style="max-width:400px">
+            <div class="modal-header">
+                <h2>Who are you?</h2>
+                <button class="modal-close" id="btn-close-user-select" aria-label="Skip"><span class="mi mi-sm">close</span></button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:14px">
+                    Select a profile so the dietitian knows your preferences.
+                </p>
+                <div id="user-select-grid" class="user-select-grid"></div>
+            </div>
+        </div>
+    </div>
+
+
+<!-- Modal potwierdzenia (zastępuje window.confirm) -->
+<div id="modal-confirm" class="modal-overlay hidden" role="dialog" aria-modal="true">
+  <div class="modal-box modal-box--small">
+    <p id="modal-confirm-message" class="modal-confirm-message"></p>
+    <div class="modal-confirm-buttons">
+      <button id="modal-confirm-cancel" class="btn-modal-secondary" data-i18n="common.cancel">Cancel</button>
+      <button id="modal-confirm-ok" class="btn-modal-danger" data-i18n="common.delete">Delete</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal edycji przepisu -->
+<div id="recipe-edit-modal" class="recipe-modal-overlay hidden" onclick="closeRecipeEditModal(event)">
+  <div class="recipe-modal-box" onclick="event.stopPropagation()">
+    <div class="recipe-modal-header">
+      <h2 class="recipe-modal-title" data-i18n="recipe_editor.title_edit">Edit Recipe</h2>
+      <button class="btn-md3-icon recipe-modal-close" onclick="closeRecipeEditModal()" aria-label="Close"><span class="mi">close</span></button>
+    </div>
+    <div class="recipe-modal-body">
+      <!-- LEWA KOLUMNA -->
+      <div class="recipe-modal-col-left">
+        <div class="recipe-modal-field">
+          <label class="recipe-modal-label" data-i18n="recipe_editor.name_placeholder">Recipe name</label>
+          <input type="text" id="recipe-modal-name" class="recipe-modal-input" placeholder="Recipe name..." data-i18n-placeholder="recipe_editor.name_placeholder" />
+        </div>
+        <div class="recipe-modal-field recipe-modal-field--grow">
+          <label class="recipe-modal-label" data-i18n="recipe_editor.description_placeholder">Preparation method</label>
+          <textarea id="recipe-modal-desc" class="recipe-modal-textarea" placeholder="Preparation method, notes..." data-i18n-placeholder="recipe_editor.description_placeholder"></textarea>
+        </div>
+      </div>
+      <!-- PRAWA KOLUMNA -->
+      <div class="recipe-modal-col-right">
+        <!-- Typ posiłku — multi-select chips -->
+        <div class="recipe-modal-field">
+          <label class="recipe-modal-label" data-i18n="recipe_editor.meal_type_label">Meal type</label>
+          <div class="recipe-meal-chips" id="recipe-modal-meal-chips">
+            <button type="button" class="meal-chip" data-value="sniadanie"><span class="mi mi-sm">wb_sunny</span> <span data-i18n="recipes.meal_type_breakfast">Breakfast</span></button>
+            <button type="button" class="meal-chip" data-value="obiad"><span class="mi mi-sm">restaurant</span> <span data-i18n="recipes.meal_type_lunch">Lunch</span></button>
+            <button type="button" class="meal-chip" data-value="kolacja"><span class="mi mi-sm">nightlight_round</span> <span data-i18n="recipes.meal_type_dinner">Dinner</span></button>
+            <button type="button" class="meal-chip" data-value="przekaska"><span class="mi mi-sm">apple</span> <span data-i18n="recipes.meal_type_snack">Snack</span></button>
+          </div>
+        </div>
+        <!-- Author -->
+        <div class="recipe-modal-field">
+          <label class="recipe-modal-label" data-i18n="recipe_editor.author_label">Author</label>
+          <input type="text" id="recipe-modal-author" class="recipe-modal-input" placeholder="Author name..." data-i18n-placeholder="recipe_editor.author_placeholder" />
+        </div>
+        <!-- Składniki — accordion -->
+        <div class="recipe-modal-accordion" id="accordion-ingredients">
+          <button type="button" class="recipe-modal-accordion-btn active" onclick="toggleModalAccordion('accordion-ingredients', 'accordion-nutrition')">
+            <span class="recipe-modal-label" data-i18n="recipe_editor.ingredients_label">Ingredients</span>
+            <span class="mi mi-sm accordion-arrow">expand_less</span>
+          </button>
+          <div class="recipe-modal-accordion-body">
+            <div class="recipe-modal-field--grow">
+              <div id="recipe-modal-ingredients-list" class="recipe-modal-ing-list"></div>
+              <div class="recipe-modal-add-ing">
+                <div class="recipe-modal-add-ing-name-wrap">
+                  <input type="text" id="recipe-modal-ing-name" class="recipe-modal-add-ing-input" placeholder="Ingredient name..." data-i18n-placeholder="recipe_editor.ingredient_name_placeholder" />
+                  <div id="recipe-modal-ing-suggestions" class="add-ing-suggestions hidden"></div>
+                </div>
+                <input type="number" id="recipe-modal-ing-amount" class="recipe-modal-add-ing-qty" value="1" min="0" step="0.1" />
+                <select id="recipe-modal-ing-unit" class="recipe-modal-add-ing-unit">
+                  <option value="szt.">pcs.</option>
+                  <option value="g">g</option>
+                  <option value="ml">ml</option>
+                  <option value="lyzka">tbsp</option>
+                  <option value="lyzeczka">tsp</option>
+                  <option value="szczypta">pinch</option>
+                </select>
+                <button id="recipe-modal-ing-add-btn" class="recipe-modal-add-ing-btn" type="button">
+                  <span class="mi mi-sm">add</span> <span data-i18n="recipe_editor.ingredient_add">Add</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Nutritional values accordion -->
+        <div class="recipe-modal-accordion" id="accordion-nutrition">
+          <button type="button" class="recipe-modal-accordion-btn" onclick="toggleModalAccordion('accordion-nutrition', 'accordion-ingredients')">
+            <span class="recipe-modal-label" data-i18n="recipe_editor.nutrition_label">Nutritional values (per serving)</span>
+            <span class="mi mi-sm accordion-arrow">expand_more</span>
+          </button>
+          <div class="recipe-modal-accordion-body" style="display:none">
+            <div class="recipe-modal-nutrition-rows">
+              <div class="recipe-modal-nutrition-row">
+                <span class="recipe-modal-nutrition-label" data-i18n="recipe_editor.nutrition_kcal">kcal</span>
+                <input type="number" id="recipe-modal-cal" class="recipe-modal-nutrition-input" min="0" placeholder="—" />
+              </div>
+              <div class="recipe-modal-nutrition-row">
+                <span class="recipe-modal-nutrition-label" data-i18n="recipe_editor.nutrition_protein">protein (g)</span>
+                <input type="number" id="recipe-modal-prot" class="recipe-modal-nutrition-input" min="0" step="0.1" placeholder="—" />
+              </div>
+              <div class="recipe-modal-nutrition-row">
+                <span class="recipe-modal-nutrition-label" data-i18n="recipe_editor.nutrition_fat">fat (g)</span>
+                <input type="number" id="recipe-modal-fat" class="recipe-modal-nutrition-input" min="0" step="0.1" placeholder="—" />
+              </div>
+              <div class="recipe-modal-nutrition-row">
+                <span class="recipe-modal-nutrition-label" data-i18n="recipe_editor.nutrition_carbs">carbs (g)</span>
+                <input type="number" id="recipe-modal-carbs" class="recipe-modal-nutrition-input" min="0" step="0.1" placeholder="—" />
+              </div>
+              <div class="recipe-modal-nutrition-row">
+                <span class="recipe-modal-nutrition-label" data-i18n="recipe_editor.nutrition_fiber">fiber (g)</span>
+                <input type="number" id="recipe-modal-fiber" class="recipe-modal-nutrition-input" min="0" step="0.1" placeholder="—" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="recipe-modal-footer">
+      <button class="btn-md3-outlined" onclick="closeRecipeEditModal()" type="button">
+        <span class="mi">close</span>
+        <span data-i18n="recipe_editor.cancel">Cancel</span>
+      </button>
+      <button id="recipe-modal-save-btn" class="btn-md3-filled" type="button">
+        <span class="mi">save</span>
+        <span data-i18n="recipe_editor.save">Save</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+    <script src=/static/app.js></script>
+</body>
+</html>

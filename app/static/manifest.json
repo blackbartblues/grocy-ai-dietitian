@@ -1,0 +1,18 @@
+{
+  "name": "Dietetyk AI",
+  "short_name": "Dietetyk",
+  "description": "Asystent dietetyczny z listą zakupów i spiżarnią",
+  "start_url": "/lite",
+  "display": "standalone",
+  "background_color": "#1e1e1e",
+  "theme_color": "#4caf50",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/static/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

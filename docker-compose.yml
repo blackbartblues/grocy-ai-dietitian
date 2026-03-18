@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  dietetyk-ai:
+    build: .
+    container_name: dietetyk-ai
+    restart: unless-stopped
+    ports:
+      - "7860:7860"
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GROCY_BASE_URL=${GROCY_BASE_URL}
+      - GROCY_API_KEY=${GROCY_API_KEY}
+    volumes:
+      - dietetyk_data:/data
+
+volumes:
+  dietetyk_data:
+    driver: local

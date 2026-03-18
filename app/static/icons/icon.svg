@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Tło zaokrąglone -->
+  <rect width="512" height="512" rx="110" fill="#1a1a1a"/>
+
+  <!-- Jabłko (lewy górny) -->
+  <!-- ogonek -->
+  <path d="M172 115 Q180 95 200 98" stroke="#4caf50" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <!-- liść -->
+  <path d="M172 122 Q195 105 208 120 Q192 133 172 122Z" fill="#4caf50"/>
+  <!-- jabłko body -->
+  <path d="M122 175 Q100 175 88 210 Q72 255 84 305 Q96 350 120 372 Q138 388 158 383 Q175 378 192 378 Q209 378 226 383 Q246 388 264 372 Q288 350 300 305 Q312 255 296 210 Q284 175 262 175 Q242 175 222 188 Q212 194 202 194 Q192 194 182 188 Q162 175 122 175Z"
+    fill="#4caf50"/>
+  <!-- połysk -->
+  <ellipse cx="158" cy="220" rx="22" ry="14" fill="rgba(255,255,255,0.18)" transform="rotate(-30 158 220)"/>
+
+  <!-- Lista zakupów (prawa strona) -->
+  <!-- Kartka -->
+  <rect x="280" y="150" width="165" height="210" rx="14" fill="#2a2a2a" stroke="#4caf50" stroke-width="6"/>
+  <!-- Linia 1 + check -->
+  <circle cx="312" cy="210" r="10" fill="none" stroke="#4caf50" stroke-width="5"/>
+  <path d="M306 210 L311 216 L320 204" stroke="#4caf50" stroke-width="5" stroke-linecap="round" fill="none"/>
+  <rect x="334" y="205" width="90" height="10" rx="5" fill="#4caf50" opacity="0.7"/>
+  <!-- Linia 2 + check -->
+  <circle cx="312" cy="250" r="10" fill="none" stroke="#4caf50" stroke-width="5"/>
+  <path d="M306 250 L311 256 L320 244" stroke="#4caf50" stroke-width="5" stroke-linecap="round" fill="none"/>
+  <rect x="334" y="245" width="75" height="10" rx="5" fill="#4caf50" opacity="0.7"/>
+  <!-- Linia 3 — pusta -->
+  <circle cx="312" cy="290" r="10" fill="none" stroke="#555" stroke-width="5"/>
+  <rect x="334" y="285" width="85" height="10" rx="5" fill="#444"/>
+  <!-- Linia 4 — pusta -->
+  <circle cx="312" cy="330" r="10" fill="none" stroke="#555" stroke-width="5"/>
+  <rect x="334" y="325" width="65" height="10" rx="5" fill="#444"/>
+</svg>

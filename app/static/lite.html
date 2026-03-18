@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Diet AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&subset=latin,latin-ext&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#4caf50">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
+    <style>
+        /* === MOBILE LITE OVERRIDE === */
+        /* Ukryj wszystko co nie jest potrzebne */
+        .app-header, .chat-panel, .history-panel,
+        .resize-handle, #resize-history, #resize-recipes { display: none !important; }
+
+        /* Pełny ekran */
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Główny layout */
+        .app-layout {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            height: 100dvh; /* dynamic viewport height — obsługuje pasek adresu mobile */
+        }
+
+        /* Panel przepisów zajmuje całą dostępną przestrzeń */
+        .recipes-panel {
+            flex: 1;
+            width: 100% !important;
+            min-width: 0 !important;
+            max-width: 100% !important;
+            height: 0; /* flex wymusi poprawną wysokość */
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: none;
+            border-radius: 0;
+        }
+
+        /* Zakładki na DOLE */
+        .panel-tabs {
+            order: 2; /* przesuń na dół */
+            display: flex;
+            border-top: 1px solid var(--border);
+            border-bottom: none;
+            background: var(--bg-surface);
+            flex-shrink: 0;
+            /* safe area dla iPhone z notchem */
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .panel-tabs .tab-btn {
+            flex: 1;
+            padding: 12px 4px 10px;
+            font-size: 0.75rem;
+            border: none;
+            border-radius: 0;
+            background: transparent;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            min-height: 52px;
+        }
+
+        .panel-tabs .tab-btn.active {
+            color: var(--accent, #4caf50);
+            border-top: 2px solid var(--accent, #4caf50);
+            border-bottom: none;
+        }
+
+        /* Zawartość zakładek — przewijalna, zajmuje resztę ekranu */
+        .tab-content {
+            order: 1;
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 6px 12px 12px;
+        }
+
+        /* === WIERSZ DODAWANIA === */
+        .add-form {
+            display: flex;
+            flex-wrap: nowrap;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 5px;
+        }
+
+        .add-form .add-input-wrapper {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .add-form input[type="text"],
+        .add-form .add-input-wrapper input[type="text"] {
+            width: 100%;
+            height: 40px;
+            padding: 0 10px;
+            font-size: 14px; /* 16px zapobiega zoom na iOS ale tu mamy nowrap */
+            box-sizing: border-box;
+        }
+
+        .add-form input[type="number"],
+        .add-form .add-amount-input {
+            width: 52px;
+            height: 40px;
+            padding: 0 6px;
+            font-size: 14px;
+            box-sizing: border-box;
+            flex-shrink: 0;
+        }
+
+        .add-form select,
+        .add-form .add-unit-select {
+            height: 40px;
+            padding: 0 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+            flex-shrink: 0;
+        }
+
+        .add-form .btn-add {
+            height: 40px;
+            width: 40px;
+            min-height: 40px;
+            padding: 0;
+            font-size: 1.3rem;
+            line-height: 1;
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* === WIERSZ WYSZUKIWANIA + FILTRY === */
+        /* Wiersz 1: search input + przycisk odśwież */
+        .list-header-row {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-bottom: 5px;
+        }
+
+        .list-header-search-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .list-header-search-row input[type="text"] {
+            flex: 1;
+            height: 36px;
+            padding: 0 10px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        .list-header-row > input[type="text"] {
+            flex: 1;
+            height: 36px;
+            padding: 0 10px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        .list-header-row .btn-refresh {
+            height: 36px;
+            width: 36px;
+            min-width: 36px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        /* Wiersz 2: filtry w jednej linii */
+        .list-header-row .list-filters,
+        .list-header-row .pantry-filters {
+            display: flex;
+            gap: 6px;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+
+        .list-header-row .list-filters::-webkit-scrollbar,
+        .list-header-row .pantry-filters::-webkit-scrollbar {
+            display: none;
+        }
+
+        .list-filter-btn {
+            height: 32px;
+            padding: 0 12px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            flex-shrink: 0;
+            border-radius: 16px;
+        }
+
+        /* Karty przepisów — pełna szerokość */
+        .recipe-card {
+            width: 100%;
+            max-width: 100%;
+        }
+
+        /* Ukryj sekcję "Ta sesja" w lite — tylko Grocy */
+        .recipes-section:first-child,
+        .recipes-separator { display: none; }
+
+        /* Modal edycji przepisu — pełny ekran na mobile */
+        .recipe-modal-box {
+            max-width: 100%;
+            max-height: 100vh;
+            border-radius: 0;
+            height: 100%;
+        }
+
+        /* Modals — pełny ekran */
+        .modal {
+            max-width: 100%;
+            margin: 0;
+            border-radius: 0;
+            height: 100%;
+            max-height: 100vh;
+        }
+
+        /* Filtry ukryte — zastąpione select dropdownem */
+        .list-header-row .list-filters,
+        .list-header-row .pantry-filters {
+            display: none !important;
+        }
+
+        /* Select filter — styl pill obok refresh */
+        .filter-select {
+            height: 36px;
+            padding: 0 8px;
+            font-size: 13px;
+            border-radius: 18px;
+            border: 1px solid var(--border);
+            background: var(--bg-surface);
+            color: var(--text-primary);
+            flex-shrink: 0;
+            cursor: pointer;
+            -webkit-appearance: auto;
+        }
+        /* Mini top-bar z przyciskiem motywu */
+        .lite-topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 12px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+            min-height: 36px;
+        }
+
+        .btn-theme-lite {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: var(--text-secondary);
+            padding: 4px 8px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.75rem;
+        }
+
+        .btn-theme-lite:hover {
+            color: var(--text-primary);
+            background: var(--bg-hover);
+        }
+
+        .btn-user-lite {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: var(--text-secondary);
+            padding: 4px 8px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+        }
+
+        .btn-user-lite:hover {
+            color: var(--text-primary);
+            background: var(--bg-hover);
+        }
+
+        .btn-user-lite .user-avatar-lite {
+            font-size: 1.1rem;
+            line-height: 1;
+        }
+
+        .btn-user-lite .user-name-lite {
+            max-width: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body class="lite-mode">
+    <div class="app-layout">
+        <!-- Panel z 3 zakładkami — bez historii i chatu -->
+        <aside class="recipes-panel" id="recipes-panel" aria-label="Panel">
+            <div class="panel-tabs">
+              <button class="tab-btn active" data-tab="recipes"><span class="mi">menu_book</span><span data-i18n="nav.recipes">Recipes</span></button>
+              <button class="tab-btn" data-tab="shopping"><span class="mi">shopping_cart</span><span data-i18n="nav.shopping">Shopping</span></button>
+              <button class="tab-btn" data-tab="pantry"><span class="mi">kitchen</span><span data-i18n="nav.pantry">Pantry</span></button>
+            </div>
+
+            <!-- Top bar z przełącznikiem motywu -->
+            <div class="lite-topbar">
+                <button class="btn-user-lite" id="btn-user-lite" onclick="showUserSelectModal()">
+                    <span class="user-avatar-lite" id="user-avatar-lite">👤</span>
+                    <span class="user-name-lite" id="user-name-lite">Select user</span>
+                </button>
+                <button class="btn-theme-lite" id="btn-theme-lite" onclick="toggleTheme()">
+                    <span class="mi mi-sm" id="theme-lite-icon">dark_mode</span>
+                    <span id="theme-lite-label">Light</span>
+                </button>
+            </div>
+
+            <!-- Zakładka Przepisy -->
+            <div id="tab-recipes" class="tab-content">
+              <div class="recipes-content">
+                <div class="recipes-section" style="display:none">
+                    <div id="session-recipes"></div>
+                </div>
+                <div class="recipes-section">
+                    <div id="grocy-recipes" class="recipes-list">
+                        <p class="empty-state" data-i18n="common.loading">Loading...</p>
+                    </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Zakładka Lista zakupów -->
+            <div id="tab-shopping" class="tab-content hidden">
+              <div class="add-form">
+                <div class="add-input-wrapper" style="flex:1;min-width:140px;position:relative">
+                  <input type="text" id="shopping-input" placeholder="Product..." data-i18n-placeholder="shopping.add_placeholder" autocomplete="off" />
+                  <div id="shopping-suggestions" class="suggestions-dropdown hidden"></div>
+                </div>
+                <input id="shopping-amount" type="number" value="1" min="0" step="0.1" class="add-amount-input" />
+                <select id="shopping-unit" class="add-unit-select">
+                  <option value="szt.">pcs.</option>
+                  <option value="g">g</option>
+                  <option value="ml">ml</option>
+                  <option value="lyzka">tbsp</option>
+                  <option value="lyzeczka">tsp</option>
+                  <option value="szczypta">pinch</option>
+                  <option value="kg">kg</option>
+                  <option value="l">l</option>
+                </select>
+                <button id="btn-shopping-add" class="btn-add">+</button>
+              </div>
+              <div class="list-header-row">
+                <div class="list-header-search-row">
+                  <input type="text" id="shopping-search" placeholder="Search..." data-i18n-placeholder="shopping.add_placeholder" />
+                  <select id="shopping-filter-select" class="filter-select">
+                    <option value="all">All</option>
+                    <option value="pending">Pending</option>
+                    <option value="done">Done</option>
+                  </select>
+                  <button id="btn-shopping-refresh" class="btn-refresh"><span class="mi mi-sm">refresh</span></button>
+                </div>
+                <div class="list-filters">
+                  <button class="list-filter-btn active" data-filter="all">All</button>
+                  <button class="list-filter-btn" data-filter="pending">Pending</button>
+                  <button class="list-filter-btn" data-filter="done">Done <span class="mi mi-sm">check</span></button>
+                </div>
+              </div>
+              <div id="shopping-list" class="items-list"></div>
+              <div class="list-footer">
+                <button id="btn-complete-shopping" class="btn-complete"><span class="mi mi-sm">check_circle</span> <span data-i18n="shopping.complete_done">Move done to pantry</span></button>
+              </div>
+            </div>
+
+            <!-- Zakładka Spiżarnia -->
+            <div id="tab-pantry" class="tab-content hidden">
+              <div class="add-form">
+                <div class="add-input-wrapper" style="flex:1;min-width:140px;position:relative">
+                  <input type="text" id="pantry-add-name" placeholder="Product..." data-i18n-placeholder="pantry.add_placeholder" autocomplete="off" />
+                  <div id="pantry-suggestions" class="suggestions-dropdown hidden"></div>
+                </div>
+                <input id="pantry-add-amount" type="number" value="1" min="0" step="0.1" class="add-amount-input" />
+                <select id="pantry-add-unit" class="add-unit-select">
+                  <option value="szt.">pcs.</option>
+                  <option value="g">g</option>
+                  <option value="ml">ml</option>
+                  <option value="lyzka">tbsp</option>
+                  <option value="lyzeczka">tsp</option>
+                  <option value="szczypta">pinch</option>
+                  <option value="kg">kg</option>
+                  <option value="l">l</option>
+                </select>
+                <button id="btn-pantry-add" class="btn-add">+</button>
+              </div>
+              <div class="list-header-row">
+                <div class="list-header-search-row">
+                  <input type="text" id="pantry-search" placeholder="Search..." data-i18n-placeholder="pantry.add_placeholder" />
+                  <select id="pantry-filter-select" class="filter-select">
+                    <option value="all">All</option>
+                    <option value="have">In stock</option>
+                    <option value="missing">Missing</option>
+                  </select>
+                  <button id="btn-pantry-refresh" class="btn-refresh"><span class="mi mi-sm">refresh</span></button>
+                </div>
+                <div class="pantry-filters list-filters">
+                  <button class="pantry-filter-btn list-filter-btn active" data-filter="all">All</button>
+                  <button class="pantry-filter-btn list-filter-btn" data-filter="have">In stock <span class="mi mi-sm">check</span></button>
+                  <button class="pantry-filter-btn list-filter-btn" data-filter="missing">Missing <span class="mi mi-sm">close</span></button>
+                </div>
+              </div>
+              <div id="pantry-list" class="items-list"></div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Modals potrzebne przez app.js -->
+    <div id="modal-settings" class="modal-overlay hidden" role="dialog" aria-modal="true">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 data-i18n="settings.title">Settings</h2>
+                <button class="modal-close" id="btn-close-settings"><span class="mi mi-sm">close</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-section">
+                    <div class="modal-section-title" data-i18n="settings.nav_users">Users</div>
+                    <div id="users-list"></div>
+                </div>
+                <div class="modal-section">
+                    <div class="modal-section-title">Appearance</div>
+                    <div class="toggle-group">
+                        <span class="toggle-label">Light theme</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="toggle-theme">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-user-select" class="modal-overlay hidden" role="dialog" aria-modal="true">
+        <div class="modal" style="max-width:400px">
+            <div class="modal-header">
+                <h2>Who are you?</h2>
+                <button class="modal-close" id="btn-close-user-select"><span class="mi mi-sm">close</span></button>
+            </div>
+            <div class="modal-body">
+                <div id="user-select-grid" class="user-select-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-confirm" class="modal-overlay hidden" role="dialog" aria-modal="true">
+        <div class="modal-box modal-box--small">
+            <p id="modal-confirm-message" class="modal-confirm-message"></p>
+            <div class="modal-confirm-buttons">
+                <button id="modal-confirm-cancel" class="btn-modal-secondary" data-i18n="common.cancel">Cancel</button>
+                <button id="modal-confirm-ok" class="btn-modal-danger" data-i18n="common.delete">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal edycji przepisu -->
+    <div id="recipe-edit-modal" class="recipe-modal-overlay hidden" onclick="closeRecipeEditModal(event)">
+        <div class="recipe-modal-box" onclick="event.stopPropagation()">
+            <div class="recipe-modal-header">
+                <h2 class="recipe-modal-title" data-i18n="recipe_editor.title_edit">Edit Recipe</h2>
+                <button class="btn-md3-icon recipe-modal-close" onclick="closeRecipeEditModal()" aria-label="Close"><span class="mi">close</span></button>
+            </div>
+            <div class="recipe-modal-body">
+              <!-- LEFT COLUMN -->
+              <div class="recipe-modal-col-left">
+                <div class="recipe-modal-field">
+                  <label class="recipe-modal-label" data-i18n="recipe_editor.name_placeholder">Recipe name</label>
+                  <input type="text" id="recipe-modal-name" class="recipe-modal-input" placeholder="Recipe name..." data-i18n-placeholder="recipe_editor.name_placeholder" />
+                </div>
+                <div class="recipe-modal-field recipe-modal-field--grow">
+                  <label class="recipe-modal-label" data-i18n="recipe_editor.description_placeholder">Preparation method</label>
+                  <textarea id="recipe-modal-desc" class="recipe-modal-textarea" placeholder="Preparation method, notes..." data-i18n-placeholder="recipe_editor.description_placeholder"></textarea>
+                </div>
+              </div>
+              <!-- RIGHT COLUMN -->
+              <div class="recipe-modal-col-right">
+                <!-- Meal type multi-select chips -->
+                <div class="recipe-modal-field">
+                  <label class="recipe-modal-label" data-i18n="recipe_editor.meal_type_label">Meal type</label>
+                  <div class="recipe-meal-chips" id="recipe-modal-meal-chips">
+                    <button type="button" class="meal-chip" data-value="sniadanie"><span class="mi mi-sm">wb_sunny</span> <span data-i18n="recipes.meal_type_breakfast">Breakfast</span></button>
+                    <button type="button" class="meal-chip" data-value="obiad"><span class="mi mi-sm">restaurant</span> <span data-i18n="recipes.meal_type_lunch">Lunch</span></button>
+                    <button type="button" class="meal-chip" data-value="kolacja"><span class="mi mi-sm">nightlight_round</span> <span data-i18n="recipes.meal_type_dinner">Dinner</span></button>
+                    <button type="button" class="meal-chip" data-value="przekaska"><span class="mi mi-sm">apple</span> <span data-i18n="recipes.meal_type_snack">Snack</span></button>
+                  </div>
+                </div>
+                <!-- Author -->
+                <div class="recipe-modal-field">
+                  <label class="recipe-modal-label" data-i18n="recipe_editor.author_label">Author</label>
+                  <input type="text" id="recipe-modal-author" class="recipe-modal-input" placeholder="Author name..." data-i18n-placeholder="recipe_editor.author_placeholder" />
+                </div>
+                <!-- Ingredients accordion -->
+                <div class="recipe-modal-accordion" id="accordion-ingredients">
+                  <button type="button" class="recipe-modal-accordion-btn active" onclick="toggleModalAccordion('accordion-ingredients', 'accordion-nutrition')">
+                    <span class="recipe-modal-label" data-i18n="recipe_editor.ingredients_label">Ingredients</span>
+                    <span class="mi mi-sm accordion-arrow">expand_less</span>
+                  </button>
+                  <div class="recipe-modal-accordion-body">
+                    <div class="recipe-modal-field--grow">
+                      <div id="recipe-modal-ingredients-list" class="recipe-modal-ing-list"></div>
+                      <div class="recipe-modal-add-ing">
+                        <div class="recipe-modal-add-ing-name-wrap">
+                          <input type="text" id="recipe-modal-ing-name" class="recipe-modal-add-ing-input" placeholder="Ingredient name..." data-i18n-placeholder="recipe_editor.ingredient_name_placeholder" />
+                          <div id="recipe-modal-ing-suggestions" class="add-ing-suggestions hidden"></div>
+                        </div>
+                        <input type="number" id="recipe-modal-ing-amount" class="recipe-modal-add-ing-qty" value="1" min="0" step="0.1" />
+                        <select id="recipe-modal-ing-unit" class="recipe-modal-add-ing-unit">
+                          <option value="szt.">pcs.</option>
+                          <option value="g">g</option>
+                          <option value="ml">ml</option>
+                          <option value="lyzka">tbsp</option>
+                          <option value="lyzeczka">tsp</option>
+                          <option value="szczypta">pinch</option>
+                        </select>
+                        <button id="recipe-modal-ing-add-btn" class="recipe-modal-add-ing-btn" type="button">
+                          <span class="mi mi-sm">add</span> <span data-i18n="recipe_editor.ingredient_add">Add</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- Nutrition accordion -->
+                <div class="recipe-modal-accordion" id="accordion-nutrition">
+                  <button type="button" class="recipe-modal-accordion-btn" onclick="toggleModalAccordion('accordion-nutrition', 'accordion-ingredients')">
+                    <span class="recipe-modal-label" data-i18n="recipe_editor.nutrition_label">Nutritional values (per serving)</span>
+                    <span class="mi mi-sm accordion-arrow">expand_more</span>
+                  </button>
+                  <div class="recipe-modal-accordion-body" style="display:none">
+                    <div class="recipe-modal-nutrition-rows">
+                      <div class="recipe-modal-nutrition-row">
+                        <span class="recipe-modal-nutrition-label" data-i18n="recipe_editor.nutrition_kcal">kcal</span>
+                        <input type="number" id="recipe-modal-cal" class="recipe-modal-nutrition-input" min="0" placeholder="—" />
+                      </div>
+                      <div class="recipe-modal-nutrition-row">
+                        <span class="recipe-modal-nutrition-label" data-i18n="recipe_editor.nutrition_protein">protein (g)</span>
+                        <input type="number" id="recipe-modal-prot" class="recipe-modal-nutrition-input" min="0" step="0.1" placeholder="—" />
+                      </div>
+                      <div class="recipe-modal-nutrition-row">
+                        <span class="recipe-modal-nutrition-label" data-i18n="recipe_editor.nutrition_fat">fat (g)</span>
+                        <input type="number" id="recipe-modal-fat" class="recipe-modal-nutrition-input" min="0" step="0.1" placeholder="—" />
+                      </div>
+                      <div class="recipe-modal-nutrition-row">
+                        <span class="recipe-modal-nutrition-label" data-i18n="recipe_editor.nutrition_carbs">carbs (g)</span>
+                        <input type="number" id="recipe-modal-carbs" class="recipe-modal-nutrition-input" min="0" step="0.1" placeholder="—" />
+                      </div>
+                      <div class="recipe-modal-nutrition-row">
+                        <span class="recipe-modal-nutrition-label" data-i18n="recipe_editor.nutrition_fiber">fiber (g)</span>
+                        <input type="number" id="recipe-modal-fiber" class="recipe-modal-nutrition-input" min="0" step="0.1" placeholder="—" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="recipe-modal-footer">
+                <button class="btn-md3-outlined" onclick="closeRecipeEditModal()" type="button">
+                  <span class="mi">close</span>
+                  <span data-i18n="recipe_editor.cancel">Cancel</span>
+                </button>
+                <button id="recipe-modal-save-btn" class="btn-md3-filled" type="button">
+                  <span class="mi">save</span>
+                  <span data-i18n="recipe_editor.save">Save</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stub elementy wymagane przez app.js żeby nie rzucał błędów -->
+    <div id="chat-messages" style="display:none"></div>
+    <div id="chat-input" style="display:none"></div>
+    <div id="btn-send" style="display:none"></div>
+    <div id="btn-settings" style="display:none"></div>
+    <div id="btn-theme" style="display:none"></div>
+    <div id="session-list" style="display:none"></div>
+    <div id="chat-model-select" style="display:none"></div>
+    <div id="btn-new-chat" style="display:none"></div>
+    <div id="header-user" style="display:none"></div>
+    <div id="header-user-avatar" style="display:none"></div>
+    <div id="header-user-name" style="display:none"></div>
+    <div id="btn-add-user" style="display:none"></div>
+    <div id="btn-save-settings" style="display:none"></div>
+    <div id="sessions-list" style="display:none"></div>
+    <div id="btn-mic" style="display:none"></div>
+    <div id="btn-tts" style="display:none"></div>
+    <div id="chat-input-text" style="display:none"></div>
+    <div id="btn-save-system-prompt" style="display:none"></div>
+    <div id="btn-reset-system-prompt" style="display:none"></div>
+
+    <script src="/static/app.js"></script>
+    <script>
+    // Uruchamia się PO app.js — bezpieczne wywołania funkcji z app.js
+    window.addEventListener('load', function() {
+
+      // === Filtry zakupów ===
+      var shoppingSelect = document.getElementById('shopping-filter-select');
+      if (shoppingSelect) {
+        shoppingSelect.addEventListener('change', function() {
+          var btn = document.querySelector('#tab-shopping .list-filter-btn[data-filter="' + this.value + '"]');
+          if (btn) btn.click();
+        });
+      }
+
+      // === Filtry spiżarni ===
+      var pantrySelect = document.getElementById('pantry-filter-select');
+      if (pantrySelect) {
+        pantrySelect.addEventListener('change', function() {
+          var btn = document.querySelector('.pantry-filter-btn[data-filter="' + this.value + '"]');
+          if (btn) btn.click();
+        });
+      }
+
+      // === Sync przycisku motywu ===
+      function syncThemeLiteBtn() {
+        var theme = document.documentElement.getAttribute('data-theme') || 'dark';
+        var icon = document.getElementById('theme-lite-icon');
+        var label = document.getElementById('theme-lite-label');
+        // Pokazuj tryb DO KTÓREGO przejdziesz po kliknięciu
+        if (icon) icon.textContent = theme === 'dark' ? 'light_mode' : 'dark_mode';
+        if (label) label.textContent = theme === 'dark' ? 'Light' : 'Dark';
+      }
+
+      // Obserwuj zmiany motywu
+      var themeObserver = new MutationObserver(function(mutations) {
+        mutations.forEach(function(m) {
+          if (m.attributeName === 'data-theme') syncThemeLiteBtn();
+        });
+      });
+      themeObserver.observe(document.documentElement, { attributes: true });
+      syncThemeLiteBtn(); // inicjalizacja
+
+      // === Sync przycisku użytkownika ===
+      function syncUserLiteBtn() {
+        var avatar = localStorage.getItem('dietetyk_user_avatar') || '👤';
+        var name = localStorage.getItem('dietetyk_user_name') || 'Select user';
+        var avatarEl = document.getElementById('user-avatar-lite');
+        var nameEl = document.getElementById('user-name-lite');
+        if (avatarEl) avatarEl.textContent = avatar;
+        if (nameEl) nameEl.textContent = name;
+      }
+
+      syncUserLiteBtn();
+
+      // Aktualizacja po selectUser (event z app.js)
+      document.addEventListener('userSelected', syncUserLiteBtn);
+
+      // Fallback: storage event (inna karta)
+      window.addEventListener('storage', function(e) {
+        if (e.key === 'dietetyk_user_name' || e.key === 'dietetyk_user_avatar') {
+          syncUserLiteBtn();
+        }
+      });
+    });
+    </script>
+</body>
+</html>
