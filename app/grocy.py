@@ -284,7 +284,7 @@ async def get_recipes() -> list:
         r = await _grocy_request("get", "objects/recipes")
         return r.json()
     except httpx.HTTPError as e:
-        raise RuntimeError(f"Błąd pobierania przepisów z Grocy: {e}") from e
+        raise RuntimeError(f"Error fetching recipes from Grocy: {e}") from e
 
 
 async def get_recipe_details(recipe_id: int) -> list:
@@ -293,7 +293,7 @@ async def get_recipe_details(recipe_id: int) -> list:
         r = await _grocy_request("get", "objects/recipes_pos", params={"query[]": f"recipe_id={recipe_id}"})
         return r.json()
     except httpx.HTTPError as e:
-        raise RuntimeError(f"Błąd pobierania składników przepisu {recipe_id}: {e}") from e
+        raise RuntimeError(f"Error fetching recipe ingredients {recipe_id}: {e}") from e
 
 
 async def get_stock() -> list:
@@ -302,7 +302,7 @@ async def get_stock() -> list:
         r = await _grocy_request("get", "stock")
         return r.json()
     except httpx.HTTPError as e:
-        raise RuntimeError(f"Błąd pobierania spiżarni z Grocy: {e}") from e
+        raise RuntimeError(f"Error fetching stock from Grocy: {e}") from e
 
 
 async def get_products() -> list:
@@ -311,7 +311,7 @@ async def get_products() -> list:
         r = await _grocy_request("get", "objects/products")
         return r.json()
     except httpx.HTTPError as e:
-        raise RuntimeError(f"Błąd pobierania produktów z Grocy: {e}") from e
+        raise RuntimeError(f"Error fetching products from Grocy: {e}") from e
 
 
 async def create_product(name: str, qu_id: Optional[int] = None) -> dict:
@@ -345,7 +345,7 @@ async def create_product(name: str, qu_id: Optional[int] = None) -> dict:
                 return r2.json()
         return created
     except httpx.HTTPError as e:
-        raise RuntimeError(f"Błąd tworzenia produktu '{name}': {e}") from e
+        raise RuntimeError(f"Error creating product '{name}': {e}") from e
 
 
 async def save_recipe(name: str, description: str, servings: int, ingredients: list = None, nutrition: dict = None, meal_type: str = None, author_name: str = None, author_avatar: str = None) -> dict:
@@ -392,10 +392,10 @@ async def save_recipe(name: str, description: str, servings: int, ingredients: l
         })
         recipe_data = r.json()
     except httpx.HTTPError as e:
-        raise RuntimeError(f"Blad zapisywania przepisu '{name}': {e}") from e
+        raise RuntimeError(f"Error saving recipe '{name}': {e}") from e
 
     recipe_id = recipe_data.get("created_object_id") or recipe_data.get("id")
-    print(f"[grocy] Przepis '{name}' zapisany z ID={recipe_id}, skladnikow={len(ingredients)}")
+    print(f"[grocy] Recipe '{name}' saved with ID={recipe_id}, ingredients={len(ingredients)}")
 
     ingredients_added = 0
     ingredients_failed = []
@@ -407,16 +407,16 @@ async def save_recipe(name: str, description: str, servings: int, ingredients: l
         ing_amount = float(ing.get("amount", 1))
         ing_unit = ing.get("unit", "")
         try:
-            print(f"[grocy] Dodaję składnik: '{ing_name}' amount={ing_amount} unit={ing_unit}")
+            print(f"[grocy] Adding ingredient: '{ing_name}' amount={ing_amount} unit={ing_unit}")
             await add_ingredient_to_recipe(int(recipe_id), ing_name, ing_amount, ing_unit)
             ingredients_added += 1
-            print(f"[grocy] Składnik '{ing_name}' dodany OK")
+            print(f"[grocy] Ingredient '{ing_name}' added OK")
         except Exception as e:
             err_str = str(e)[:120]
-            print(f"[grocy] ERROR dodawania składnika '{ing_name}': {err_str}")
+            print(f"[grocy] ERROR adding ingredient '{ing_name}': {err_str}")
             ingredients_failed.append(f"{ing_name}: {err_str}")
 
-    print(f"[grocy] Składniki: {ingredients_added} dodanych, {len(ingredients_failed)} błędów")
+    print(f"[grocy] Ingredients: {ingredients_added} added, {len(ingredients_failed)} errors")
 
     result = {
         "id": recipe_id,
@@ -427,7 +427,7 @@ async def save_recipe(name: str, description: str, servings: int, ingredients: l
     }
     if ingredients_failed:
         failed_list = ', '.join(ingredients_failed)
-        result["warning"] = f"Przepis '{name}' zapisany w Grocy (ID: {recipe_id}). Nie dodano skladnikow: {failed_list}"
+        result["warning"] = f"Recipe '{name}' saved in Grocy (ID: {recipe_id}). Failed ingredients: {failed_list}"
     return result
 
 
@@ -488,7 +488,7 @@ async def add_ingredient_to_recipe(
     product = await create_product(product_name, qu_id=qu_id)
     product_id = product.get("id") or product.get("created_object_id")
     if not product_id:
-        raise RuntimeError(f"Nie mozna uzyskac ID produktu '{product_name}'. Odpowiedz: {product}")
+        raise RuntimeError(f"Cannot get product ID for '{product_name}'. Response: {product}")
 
     product_id = int(product_id)
 
@@ -525,7 +525,7 @@ async def add_ingredient_to_recipe(
         return r.json()
     except httpx.HTTPError as e:
         raise RuntimeError(
-            f"Błąd dodawania składnika '{product_name}' do przepisu {recipe_id}: {e}"
+            f"Error adding ingredient '{product_name}' to recipe {recipe_id}: {e}"
         ) from e
 
 
@@ -547,7 +547,7 @@ async def add_to_shopping_list(
         r.raise_for_status()
         return {"success": True, "product": product_name, "amount": amount}
     except httpx.HTTPError as e:
-        raise RuntimeError(f"Błąd dodawania '{product_name}' do listy zakupów: {e}") from e
+        raise RuntimeError(f"Error adding '{product_name}' to shopping list: {e}") from e
 
 
 async def get_shopping_list() -> list:
@@ -556,7 +556,7 @@ async def get_shopping_list() -> list:
         r = await _grocy_request("get", "objects/shopping_list")
         return r.json()
     except httpx.HTTPError as e:
-        raise RuntimeError(f"Błąd pobierania listy zakupów: {e}") from e
+        raise RuntimeError(f"Error fetching shopping list: {e}") from e
 
 
 async def get_meal_plan() -> list:
@@ -565,7 +565,7 @@ async def get_meal_plan() -> list:
         r = await _grocy_request("get", "meal-plan")
         return r.json()
     except httpx.HTTPError as e:
-        raise RuntimeError(f"Błąd pobierania planu posiłków: {e}") from e
+        raise RuntimeError(f"Error fetching meal plan: {e}") from e
 
 
 async def save_meal_plan_entry(recipe_id: int, day: str, meal_type: str) -> dict:
@@ -578,7 +578,7 @@ async def save_meal_plan_entry(recipe_id: int, day: str, meal_type: str) -> dict
         })
         return r.json()
     except httpx.HTTPError as e:
-        raise RuntimeError(f"Błąd zapisywania planu posiłków: {e}") from e
+        raise RuntimeError(f"Error saving meal plan: {e}") from e
 
 
 async def check_connectivity() -> bool:
@@ -599,7 +599,7 @@ async def delete_recipe(recipe_id: int) -> bool:
         r = await _grocy_request("delete", f"objects/recipes/{recipe_id}")
         return r.status_code in (200, 204)
     except httpx.HTTPError as e:
-        raise RuntimeError(f"Blad usuwania przepisu {recipe_id}: {e}") from e
+        raise RuntimeError(f"Error deleting recipe {recipe_id}: {e}") from e
 
 # ===== v4: Nowe funkcje =====
 
@@ -635,7 +635,7 @@ async def get_shopping_list_enriched() -> list:
             result.append({
                 "id": item["id"],
                 "product_id": item.get("product_id"),
-                "name": product.get("name") or item.get("note") or f"Produkt #{pid}",
+                "name": product.get("name") or item.get("note") or f"Product #{pid}",
                 "amount": item.get("amount", 1),
                 "unit": unit_name,
                 "note": item.get("note", ""),
@@ -643,7 +643,7 @@ async def get_shopping_list_enriched() -> list:
             })
         return result
     except httpx.HTTPError as e:
-        raise RuntimeError(f"Błąd pobierania listy zakupów: {e}") from e
+        raise RuntimeError(f"Error fetching shopping list: {e}") from e
 
 
 async def add_to_shopping_list_by_name(product_name: str, amount: float = 1, unit: str = "szt.") -> dict:
@@ -673,7 +673,7 @@ async def add_to_shopping_list_by_name(product_name: str, amount: float = 1, uni
             r.raise_for_status()
             return {"success": True, "name": product_name, "amount": amount, "unit": unit}
     except httpx.HTTPError as e:
-        raise RuntimeError(f"Błąd dodawania do listy zakupów: {e}") from e
+        raise RuntimeError(f"Error adding to shopping list: {e}") from e
 
 
 async def remove_from_shopping_list(item_id: int) -> bool:
@@ -682,7 +682,7 @@ async def remove_from_shopping_list(item_id: int) -> bool:
         r = await _grocy_request("delete", f"objects/shopping_list/{item_id}")
         return r.status_code in (200, 204)
     except httpx.HTTPError as e:
-        raise RuntimeError(f"Błąd usuwania z listy zakupów: {e}") from e
+        raise RuntimeError(f"Error removing from shopping list: {e}") from e
 
 
 async def search_products(query: str) -> list:
@@ -705,7 +705,7 @@ async def search_products(query: str) -> list:
                 break
         return results
     except Exception as e:
-        raise RuntimeError(f"Błąd wyszukiwania produktów: {e}") from e
+        raise RuntimeError(f"Error searching products: {e}") from e
 
 
 async def get_pantry() -> list:
@@ -758,7 +758,7 @@ async def get_pantry() -> list:
         result.sort(key=lambda x: (not x["in_stock"], x["name"].lower()))
         return result
     except Exception as e:
-        raise RuntimeError(f"Błąd pobierania spiżarni: {e}") from e
+        raise RuntimeError(f"Error fetching pantry: {e}") from e
 
 
 async def is_product_available(product_name: str) -> bool:
@@ -826,13 +826,13 @@ async def get_recipe_ingredients_enriched(recipe_id: int) -> list:
             qu_id = product.get("qu_id_stock")
             unit_name = units_map.get(qu_id, "szt.") if qu_id else "szt."
             result.append({
-                "name": product.get("name") or f"Produkt #{pid}",
+                "name": product.get("name") or f"Product #{pid}",
                 "amount": ing.get("amount", 1),
                 "unit": unit_name,
             })
         return result
     except Exception as e:
-        raise RuntimeError(f"Błąd pobierania składników przepisu {recipe_id}: {e}") from e
+        raise RuntimeError(f"Error fetching recipe ingredients {recipe_id}: {e}") from e
 
 # ===== v7: Edycja spiżarni, listy zakupów, przepisów =====
 
@@ -858,7 +858,7 @@ async def add_to_pantry(product_name: str, amount: float, unit: str) -> dict:
         product = await create_product(product_name, qu_id=qu_id)
         product_id = product.get("id") or product.get("created_object_id")
         if not product_id:
-            raise RuntimeError(f"Nie można uzyskać ID produktu '{product_name}'")
+            raise RuntimeError(f"Cannot get product ID for '{product_name}'")
         product_id = int(product_id)
 
     try:
@@ -875,7 +875,7 @@ async def add_to_pantry(product_name: str, amount: float, unit: str) -> dict:
             "unit": unit,
         }
     except httpx.HTTPError as e:
-        raise RuntimeError(f"Błąd dodawania do spiżarni '{product_name}': {e}") from e
+        raise RuntimeError(f"Error adding to pantry '{product_name}': {e}") from e
 
 
 async def update_pantry_item(product_id: int, amount: float) -> dict:
@@ -892,7 +892,7 @@ async def update_pantry_item(product_id: int, amount: float) -> dict:
         r2.raise_for_status()
         return {"success": True, "product_id": product_id, "amount": amount}
     except httpx.HTTPError as e:
-        raise RuntimeError(f"Błąd aktualizacji spiżarni produktu {product_id}: {e}") from e
+        raise RuntimeError(f"Error updating pantry product {product_id}: {e}") from e
 
 
 async def remove_from_pantry(product_id: int) -> bool:
@@ -905,7 +905,7 @@ async def remove_from_pantry(product_id: int) -> bool:
         r = await _grocy_request("delete", f"objects/products/{product_id}")
         return r.status_code in (200, 204)
     except httpx.HTTPError as e:
-        raise RuntimeError(f"Błąd usuwania produktu {product_id}: {e}") from e
+        raise RuntimeError(f"Error removing product {product_id}: {e}") from e
 
 
 async def toggle_shopping_item_done(item_id: int, done: bool) -> dict:
@@ -915,7 +915,7 @@ async def toggle_shopping_item_done(item_id: int, done: bool) -> dict:
         r.raise_for_status()
         return {"success": True, "id": item_id, "done": done}
     except httpx.HTTPError as e:
-        raise RuntimeError(f"Błąd oznaczania zakupu {item_id}: {e}") from e
+        raise RuntimeError(f"Error toggling shopping item {item_id}: {e}") from e
 
 
 async def get_recipe(recipe_id: int) -> dict:
@@ -935,7 +935,7 @@ async def get_recipe(recipe_id: int) -> dict:
             "ingredients": ingredients,
         }
     except httpx.HTTPError as e:
-        raise RuntimeError(f"Błąd pobierania przepisu {recipe_id}: {e}") from e
+        raise RuntimeError(f"Error fetching recipe {recipe_id}: {e}") from e
 
 
 async def get_recipe_ingredients_enriched_with_pos_id(recipe_id: int) -> list:
@@ -960,13 +960,13 @@ async def get_recipe_ingredients_enriched_with_pos_id(recipe_id: int) -> list:
             result.append({
                 "pos_id": ing.get("id"),
                 "product_id": ing.get("product_id"),
-                "name": product.get("name") or f"Produkt #{pid}",
+                "name": product.get("name") or f"Product #{pid}",
                 "amount": ing.get("amount", 1),
                 "unit": unit_name,
             })
         return result
     except Exception as e:
-        raise RuntimeError(f"Błąd pobierania składników przepisu {recipe_id}: {e}") from e
+        raise RuntimeError(f"Error fetching recipe ingredients {recipe_id}: {e}") from e
 
 
 async def update_recipe(recipe_id: int, name: str = None, description: str = None) -> dict:
@@ -981,7 +981,7 @@ async def update_recipe(recipe_id: int, name: str = None, description: str = Non
         r.raise_for_status()
         return {"success": True, "id": recipe_id}
     except httpx.HTTPError as e:
-        raise RuntimeError(f"Błąd aktualizacji przepisu {recipe_id}: {e}") from e
+        raise RuntimeError(f"Error updating recipe {recipe_id}: {e}") from e
 
 
 async def add_recipe_ingredient(recipe_id: int, product_name: str, amount: float, unit: str) -> dict:
@@ -996,4 +996,4 @@ async def delete_recipe_ingredient(pos_id: int) -> bool:
         r = await _grocy_request("delete", f"objects/recipes_pos/{pos_id}")
         return r.status_code in (200, 204)
     except httpx.HTTPError as e:
-        raise RuntimeError(f"Błąd usuwania składnika przepisu {pos_id}: {e}") from e
+        raise RuntimeError(f"Error deleting recipe ingredient {pos_id}: {e}") from e

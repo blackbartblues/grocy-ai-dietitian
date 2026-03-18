@@ -15,7 +15,11 @@
     "send": "Send",
     "thinking": "Thinking...",
     "empty_state": "Start a conversation with your AI dietitian.",
-    "session_default": "Conversation"
+    "session_default": "Conversation",
+    "new_chat_greeting": "Hi! New conversation. How can I help you today?",
+    "error_connection": "Server connection error. Please try again.",
+    "error_disconnected": "Connection error. Check if the server is running.",
+    "messages_short": "msg."
   },
   "recipes": {
     "title": "Recipes",
@@ -35,7 +39,21 @@
     "meal_type_breakfast": "Breakfast",
     "meal_type_lunch": "Lunch",
     "meal_type_dinner": "Dinner",
-    "meal_type_snack": "Snack"
+    "meal_type_snack": "Snack",
+    "no_details": "No details",
+    "preparation": "Preparation method"
+  },
+  "recipe_card": {
+    "ingredients": "INGREDIENTS",
+    "per_serving": "/ serving",
+    "calories": "Calories",
+    "protein": "Protein",
+    "fat": "Fat",
+    "carbs": "Carbs",
+    "fiber": "Fiber",
+    "delete_ingredient": "Delete ingredient",
+    "delete_recipe": "Delete recipe",
+    "add_missing_to_shopping": "Add missing ingredients to shopping"
   },
   "recipe_editor": {
     "title_edit": "Edit Recipe",
@@ -55,7 +73,9 @@
     "nutrition_carbs": "carbs (g)",
     "nutrition_fiber": "fiber (g)",
     "save": "Save",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "delete_ingredient": "Delete ingredient",
+    "save_error": "Recipe save error"
   },
   "shopping": {
     "title": "Shopping List",
@@ -64,7 +84,11 @@
     "add_button": "Add",
     "complete_done": "Move done to pantry",
     "complete_done_confirm": "Move all checked items to pantry?",
-    "delete_confirm": "Remove this item?"
+    "delete_confirm": "Remove this item?",
+    "added_to_shopping": "Added to shopping: {items}",
+    "already_have": "Already have: {items}",
+    "have_all": "You already have all ingredients!",
+    "nothing_to_add": "No ingredients to add"
   },
   "pantry": {
     "title": "Pantry",
@@ -74,7 +98,10 @@
     "filter_all": "All",
     "filter_have": "In stock",
     "filter_missing": "Missing",
-    "delete_confirm": "Remove from pantry?"
+    "delete_confirm": "Remove from pantry?",
+    "add_quick": "Add",
+    "set_normal": "Set normal amount",
+    "set_always_available": "Set as always available"
   },
   "settings": {
     "title": "Settings",
@@ -112,7 +139,14 @@
     "user_add": "Add",
     "user_delete": "Delete",
     "user_delete_confirm": "Delete this user? All their sessions will also be deleted.",
-    "saved": "Saved"
+    "saved": "Saved",
+    "appearance": "Appearance",
+    "light_theme": "Light theme",
+    "loading_models": "Loading models...",
+    "no_models": "No models",
+    "ollama_unavailable": "Ollama unavailable",
+    "ollama_available": "Available ({count} models)",
+    "ollama_connection_error": "Ollama connection error"
   },
   "units": {
     "pcs": "pcs.",
@@ -121,6 +155,47 @@
     "tbsp": "tbsp",
     "tsp": "tsp",
     "pinch": "pinch"
+  },
+  "meal_types": {
+    "sniadanie": "Breakfast",
+    "obiad": "Lunch",
+    "kolacja": "Dinner",
+    "przekaska": "Snack"
+  },
+  "tool_calls": {
+    "get_recipes": "Checking recipes",
+    "get_stock": "Checking pantry",
+    "get_products": "Checking products",
+    "save_recipe": "Saving recipe",
+    "add_ingredient_to_recipe": "Adding ingredient",
+    "add_to_shopping_list": "Adding to shopping list",
+    "get_shopping_list": "Loading shopping list",
+    "get_meal_plan": "Checking meal plan",
+    "save_meal_plan_entry": "Saving meal plan",
+    "update_memory": "Remembering information",
+    "get_memory": "Loading memory",
+    "get_recipe_details": "Loading recipe details"
+  },
+  "theme": {
+    "toggle_light": "Switch to light theme",
+    "toggle_dark": "Switch to dark theme"
+  },
+  "tts": {
+    "disable": "Disable voice reading",
+    "enable": "Read aloud"
+  },
+  "stt": {
+    "dictate": "Dictate",
+    "stop_dictate": "Stop dictation"
+  },
+  "session": {
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "delete_session": "Delete conversation"
+  },
+  "user_select": {
+    "title": "Who are you?",
+    "select_prompt": "Select a profile so the dietitian knows your preferences."
   },
   "common": {
     "cancel": "Cancel",

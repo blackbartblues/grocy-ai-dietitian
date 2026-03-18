@@ -46,7 +46,7 @@ async def create_or_update_session(session_id: str, title: str = "", user_id: st
         else:
             data = {
                 "id": session_id,
-                "title": title[:60] if title else "Nowa rozmowa",
+                "title": title[:60] if title else "New conversation",
                 "created_at": now,
                 "updated_at": now,
                 "messages": [],
@@ -93,7 +93,7 @@ async def list_sessions(user_id: str = None) -> list:
                     continue
             sessions.append({
                 "id": data["id"],
-                "title": data.get("title", "Rozmowa"),
+                "title": data.get("title", "Conversation"),
                 "created_at": data.get("created_at", ""),
                 "updated_at": data.get("updated_at", ""),
                 "message_count": len(data.get("messages", [])),

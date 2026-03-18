@@ -52,9 +52,9 @@ class ChatRequest(BaseModel):
     @classmethod
     def message_not_empty(cls, v: str) -> str:
         if not v or not v.strip():
-            raise ValueError("Wiadomość nie może być pusta.")
+            raise ValueError("Message cannot be empty.")
         if len(v) > MAX_MESSAGE_LENGTH:
-            raise ValueError(f"Wiadomość jest za długa (max {MAX_MESSAGE_LENGTH} znaków).")
+            raise ValueError(f"Message is too long (max {MAX_MESSAGE_LENGTH} characters).")
         return v.strip()
 
 
@@ -67,7 +67,7 @@ class UserCreateRequest(BaseModel):
     @classmethod
     def name_not_empty(cls, v: str) -> str:
         if not v or not v.strip():
-            raise ValueError("Imię nie może być puste.")
+            raise ValueError("Name cannot be empty.")
         return v.strip()
 
 
@@ -93,7 +93,7 @@ class SettingsUpdateRequest(BaseModel):
     @classmethod
     def validate_engine(cls, v: Optional[str]) -> Optional[str]:
         if v is not None and v not in ("gemini", "ollama"):
-            raise ValueError("ai_engine musi być 'gemini' lub 'ollama'.")
+            raise ValueError("ai_engine must be 'gemini' or 'ollama'.")
         return v
 
     @field_validator("language")
@@ -119,7 +119,7 @@ async def startup_event():
 async def index():
     index_path = STATIC_DIR / "index.html"
     if not index_path.exists():
-        raise HTTPException(status_code=404, detail="Frontend nie znaleziony.")
+        raise HTTPException(status_code=404, detail="Frontend not found.")
     return HTMLResponse(content=index_path.read_text(encoding="utf-8"))
 
 
@@ -128,7 +128,7 @@ async def lite_app():
     """Wersja bez chatu — tylko Przepisy/Zakupy/Spiżarnia."""
     lite_path = STATIC_DIR / "lite.html"
     if not lite_path.exists():
-        raise HTTPException(status_code=404, detail="Lite frontend nie znaleziony.")
+        raise HTTPException(status_code=404, detail="Lite frontend not found.")
     return HTMLResponse(content=lite_path.read_text(encoding="utf-8"))
 
 
@@ -144,7 +144,7 @@ async def chat(request: ChatRequest):
             async for chunk in gem.chat_stream(session_id, request.message, request.user_id):
                 yield chunk
         except Exception as e:
-            error_json = json.dumps({"error": f"Wewnętrzny błąd serwera: {str(e)[:200]}"})
+            error_json = json.dumps({"error": f"Internal server error: {str(e)[:200]}"})
             yield f"data: {error_json}\n\n"
 
     return StreamingResponse(
@@ -186,7 +186,7 @@ async def recipes_panel(session_id: str = Query(default="")):
             recipe_id = r.get("id")
             recipe_data = {
                 "id": recipe_id,
-                "name": r.get("name", "Przepis"),
+                "name": r.get("name", "Recipe"),
                 "meal_type": r.get("type", ""),
                 "calories": None,
                 "description": r.get("description", ""),
@@ -217,7 +217,7 @@ async def delete_recipe_endpoint(recipe_id: int):
         recipes = await grocy.get_recipes()
         exists = any(str(r.get("id")) == str(recipe_id) for r in recipes)
         if not exists:
-            raise HTTPException(status_code=404, detail=f"Przepis {recipe_id} nie istnieje.")
+            raise HTTPException(status_code=404, detail=f"Recipe {recipe_id} not found.")
     except HTTPException:
         raise
     except Exception:
@@ -226,12 +226,12 @@ async def delete_recipe_endpoint(recipe_id: int):
     try:
         ok = await grocy.delete_recipe(recipe_id)
         if not ok:
-            raise HTTPException(status_code=404, detail=f"Przepis {recipe_id} nie istnieje lub już usunięty.")
+            raise HTTPException(status_code=404, detail=f"Recipe {recipe_id} not found or already deleted.")
         return JSONResponse({"deleted": recipe_id})
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Błąd usuwania przepisu: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Recipe delete error: {str(e)}")
 
 
 # ── Export ───────────────────────────────────────────────────
@@ -260,7 +260,7 @@ async def export_meal_plan(session_id: str = Query(default="")):
             ingredients_list += f"<li>{ing}</li>"
         recipes_html += f"""
         <div class="recipe-print">
-            <h3>{r.get('name', 'Przepis')}</h3>
+            <h3>{r.get('name', 'Recipe')}</h3>
             {f'<p class="meal-type">{r.get("meal_type", "")}</p>' if r.get("meal_type") else ''}
             {f'<ul>{ingredients_list}</ul>' if ingredients_list else ''}
             {f'<p class="description">{r.get("description", "")[:500]}</p>' if r.get("description") else ''}
@@ -270,7 +270,7 @@ async def export_meal_plan(session_id: str = Query(default="")):
     shopping_html = ""
     for item in shopping_items:
         pid = str(item.get("product_id", ""))
-        pname = products_map.get(pid, f"Produkt #{pid}")
+        pname = products_map.get(pid, f"Product #{pid}")
         amount = item.get("amount", "")
         shopping_html += f"<li>{pname} — {amount}</li>"
 
@@ -278,7 +278,7 @@ async def export_meal_plan(session_id: str = Query(default="")):
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Jadłospis — Dietetyk AI</title>
+    <title>Meal Plan — Diet AI</title>
     <style>
         body {{ font-family: Arial, sans-serif; margin: 20px; color: #333; }}
         h1 {{ color: #333; border-bottom: 2px solid #333; padding-bottom: 10px; }}
@@ -298,12 +298,12 @@ async def export_meal_plan(session_id: str = Query(default="")):
     </style>
 </head>
 <body>
-    <h1>Jadłospis — Dietetyk AI</h1>
-    <h2>Przepisy ({len(session_recipes)})</h2>
-    {recipes_html if recipes_html else '<p>Brak przepisów w tej sesji.</p>'}
-    <h2>Lista zakupów</h2>
+    <h1>Meal Plan — Diet AI</h1>
+    <h2>Recipes ({len(session_recipes)})</h2>
+    {recipes_html if recipes_html else '<p>No recipes in this session.</p>'}
+    <h2>Shopping List</h2>
     <div class="shopping-list">
-        {f'<ul>{shopping_html}</ul>' if shopping_html else '<p>Lista zakupów jest pusta.</p>'}
+        {f'<ul>{shopping_html}</ul>' if shopping_html else '<p>Shopping list is empty.</p>'}
     </div>
     <script>
         window.onload = function() {{ setTimeout(function() {{ window.print(); }}, 300); }};
@@ -354,7 +354,7 @@ async def delete_user(user_id: str):
     try:
         ok = await usr_module.delete_user(user_id)
         if not ok:
-            raise HTTPException(status_code=404, detail="Użytkownik nie znaleziony.")
+            raise HTTPException(status_code=404, detail="User not found.")
         return JSONResponse({"deleted": user_id})
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -388,7 +388,7 @@ async def get_ollama_models():
             models = [m["name"] for m in r.json().get("models", [])]
             return JSONResponse({"models": models})
     except Exception:
-        return JSONResponse({"models": [], "error": "Ollama niedostępna"})
+        return JSONResponse({"models": [], "error": "Ollama unavailable"})
 
 
 # ── Historia sesji ───────────────────────────────────────────
@@ -435,7 +435,7 @@ class ShoppingAddRequest(BaseModel):
     @classmethod
     def name_not_empty(cls, v: str) -> str:
         if not v or not v.strip():
-            raise ValueError("Nazwa produktu nie może być pusta.")
+            raise ValueError("Product name cannot be empty.")
         return v.strip()
 
 
@@ -446,7 +446,7 @@ async def get_shopping_list_endpoint():
         items = await grocy.get_shopping_list_enriched()
         return JSONResponse(items)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Błąd pobierania listy zakupów: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Shopping list fetch error: {str(e)}")
 
 
 @app.post("/api/shopping-list")
@@ -456,7 +456,7 @@ async def add_to_shopping_list_endpoint(request: ShoppingAddRequest):
         result = await grocy.add_to_shopping_list_by_name(request.product_name, request.amount, request.unit)
         return JSONResponse(result, status_code=201)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Błąd dodawania do listy zakupów: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Shopping list add error: {str(e)}")
 
 
 @app.post("/api/shopping-list/complete-done")
@@ -497,12 +497,12 @@ async def delete_shopping_list_item(item_id: int):
     try:
         ok = await grocy.remove_from_shopping_list(item_id)
         if not ok:
-            raise HTTPException(status_code=404, detail=f"Wpis {item_id} nie istnieje.")
+            raise HTTPException(status_code=404, detail=f"Item {item_id} not found.")
         return JSONResponse({"deleted": item_id})
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Błąd usuwania: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Delete error: {str(e)}")
 
 
 @app.get("/api/products/search")
@@ -514,7 +514,7 @@ async def search_products_endpoint(q: str = ""):
         results = await grocy.search_products(q)
         return JSONResponse(results)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Błąd wyszukiwania: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Search error: {str(e)}")
 
 
 @app.get("/api/pantry")
@@ -524,7 +524,7 @@ async def get_pantry_endpoint():
         items = await grocy.get_pantry()
         return JSONResponse(items)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Błąd pobierania spiżarni: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Pantry fetch error: {str(e)}")
 
 # ===== v7: Edycja spiżarni, listy zakupów, przepisów =====
 
@@ -537,7 +537,7 @@ class PantryAddRequest(BaseModel):
     @classmethod
     def name_not_empty(cls, v: str) -> str:
         if not v or not v.strip():
-            raise ValueError("Nazwa produktu nie może być pusta.")
+            raise ValueError("Product name cannot be empty.")
         return v.strip()
 
 
@@ -563,7 +563,7 @@ class RecipeIngredientRequest(BaseModel):
     @classmethod
     def name_not_empty(cls, v: str) -> str:
         if not v or not v.strip():
-            raise ValueError("Nazwa produktu nie może być pusta.")
+            raise ValueError("Product name cannot be empty.")
         return v.strip()
 
 
@@ -574,7 +574,7 @@ async def add_to_pantry_endpoint(request: PantryAddRequest):
         result = await grocy.add_to_pantry(request.product_name, request.amount, request.unit)
         return JSONResponse(result, status_code=201)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Błąd dodawania do spiżarni: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Pantry add error: {str(e)}")
 
 
 @app.put("/api/pantry/{product_id}")
@@ -584,7 +584,7 @@ async def update_pantry_item_endpoint(product_id: int, request: PantryUpdateRequ
         result = await grocy.update_pantry_item(product_id, request.amount)
         return JSONResponse(result)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Błąd aktualizacji spiżarni: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Pantry update error: {str(e)}")
 
 
 @app.delete("/api/pantry/{product_id}")
@@ -593,12 +593,12 @@ async def remove_from_pantry_endpoint(product_id: int):
     try:
         ok = await grocy.remove_from_pantry(product_id)
         if not ok:
-            raise HTTPException(status_code=404, detail=f"Produkt {product_id} nie istnieje.")
+            raise HTTPException(status_code=404, detail=f"Product {product_id} not found.")
         return JSONResponse({"deleted": product_id})
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Błąd usuwania z spiżarni: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Pantry delete error: {str(e)}")
 
 
 @app.put("/api/shopping-list/{item_id}/done")
@@ -608,7 +608,7 @@ async def toggle_shopping_done_endpoint(item_id: int, request: ShoppingDoneReque
         result = await grocy.toggle_shopping_item_done(item_id, request.done)
         return JSONResponse(result)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Błąd oznaczania zakupu: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Shopping item toggle error: {str(e)}")
 
 
 @app.get("/api/recipes/{recipe_id}")
@@ -618,7 +618,7 @@ async def get_recipe_endpoint(recipe_id: int):
         data = await grocy.get_recipe(recipe_id)
         return JSONResponse(data)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Błąd pobierania przepisu: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Recipe fetch error: {str(e)}")
 
 
 @app.put("/api/recipes/{recipe_id}")
@@ -628,7 +628,7 @@ async def update_recipe_endpoint(recipe_id: int, request: RecipeUpdateRequest):
         result = await grocy.update_recipe(recipe_id, name=request.name, description=request.description)
         return JSONResponse(result)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Błąd aktualizacji przepisu: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Recipe update error: {str(e)}")
 
 
 @app.post("/api/recipes/{recipe_id}/ingredients")
@@ -638,7 +638,7 @@ async def add_recipe_ingredient_endpoint(recipe_id: int, request: RecipeIngredie
         result = await grocy.add_recipe_ingredient(recipe_id, request.product_name, request.amount, request.unit)
         return JSONResponse(result, status_code=201)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Błąd dodawania składnika: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Ingredient add error: {str(e)}")
 
 
 @app.delete("/api/recipes/{recipe_id}/ingredients/{pos_id}")
@@ -647,12 +647,12 @@ async def delete_recipe_ingredient_endpoint(recipe_id: int, pos_id: int):
     try:
         ok = await grocy.delete_recipe_ingredient(pos_id)
         if not ok:
-            raise HTTPException(status_code=404, detail=f"Składnik {pos_id} nie istnieje.")
+            raise HTTPException(status_code=404, detail=f"Ingredient {pos_id} not found.")
         return JSONResponse({"deleted": pos_id})
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Błąd usuwania składnika: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Ingredient delete error: {str(e)}")
 
 class ShoppingAmountRequest(BaseModel):
     amount: float
@@ -666,7 +666,7 @@ async def update_shopping_item_amount(item_id: int, request: ShoppingAmountReque
         r.raise_for_status()
         return JSONResponse({"success": True, "id": item_id, "amount": request.amount})
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Błąd aktualizacji ilości: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Amount update error: {str(e)}")
 
 
 # ===== v8: Naprawa jednostek + Dodaj brakujące do zakupów =====
@@ -693,7 +693,7 @@ async def fix_existing_product_units():
                         fixed.append({"name": p["name"], "unit": parsed["unit"]})
         return JSONResponse({"fixed": len(fixed), "products": fixed})
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Błąd naprawy jednostek: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Unit fix error: {str(e)}")
 
 
 @app.post("/api/recipes/{recipe_id}/add-missing-to-shopping")
@@ -717,4 +717,4 @@ async def add_missing_to_shopping(recipe_id: int):
                 added.append({"name": name, "amount": amount, "unit": unit})
         return JSONResponse({"added": added, "already_have": already_have})
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Błąd dodawania brakujących składników: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Missing ingredients add error: {str(e)}")

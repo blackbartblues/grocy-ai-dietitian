@@ -15,7 +15,11 @@
     "send": "Wyślij",
     "thinking": "Myślę...",
     "empty_state": "Rozpocznij rozmowę ze swoim asystentem dietetycznym.",
-    "session_default": "Rozmowa"
+    "session_default": "Rozmowa",
+    "new_chat_greeting": "Cześć! Nowa rozmowa. Czym mogę Ci dziś pomóc?",
+    "error_connection": "Błąd połączenia z serwerem. Spróbuj ponownie.",
+    "error_disconnected": "Błąd połączenia. Sprawdź czy serwer działa.",
+    "messages_short": "wiad."
   },
   "recipes": {
     "title": "Przepisy",
@@ -35,7 +39,21 @@
     "meal_type_breakfast": "Śniadanie",
     "meal_type_lunch": "Obiad",
     "meal_type_dinner": "Kolacja",
-    "meal_type_snack": "Przekąska"
+    "meal_type_snack": "Przekąska",
+    "no_details": "Brak szczegółów",
+    "preparation": "Sposób przygotowania"
+  },
+  "recipe_card": {
+    "ingredients": "SKŁADNIKI",
+    "per_serving": "/ porcja",
+    "calories": "Kalorie",
+    "protein": "Białko",
+    "fat": "Tłuszcz",
+    "carbs": "Węglowodany",
+    "fiber": "Błonnik",
+    "delete_ingredient": "Usuń składnik",
+    "delete_recipe": "Usuń przepis",
+    "add_missing_to_shopping": "Brakujące składniki do zakupów"
   },
   "recipe_editor": {
     "title_edit": "Edytuj przepis",
@@ -55,7 +73,9 @@
     "nutrition_carbs": "węglowodany (g)",
     "nutrition_fiber": "błonnik (g)",
     "save": "Zapisz",
-    "cancel": "Anuluj"
+    "cancel": "Anuluj",
+    "delete_ingredient": "Usuń składnik",
+    "save_error": "Błąd zapisu przepisu"
   },
   "shopping": {
     "title": "Lista zakupów",
@@ -64,7 +84,11 @@
     "add_button": "Dodaj",
     "complete_done": "Przenieś kupione do spiżarni",
     "complete_done_confirm": "Przenieść wszystkie zaznaczone do spiżarni?",
-    "delete_confirm": "Usunąć ten wpis?"
+    "delete_confirm": "Usunąć ten wpis?",
+    "added_to_shopping": "Dodano do zakupów: {items}",
+    "already_have": "Masz już: {items}",
+    "have_all": "Masz już wszystkie składniki!",
+    "nothing_to_add": "Brak składników do dodania"
   },
   "pantry": {
     "title": "Spiżarnia",
@@ -74,7 +98,10 @@
     "filter_all": "Wszystkie",
     "filter_have": "Mam",
     "filter_missing": "Brakuje",
-    "delete_confirm": "Usunąć ze spiżarni?"
+    "delete_confirm": "Usunąć ze spiżarni?",
+    "add_quick": "Dodaj",
+    "set_normal": "Ustaw normalną ilość",
+    "set_always_available": "Ustaw jako zawsze dostępny"
   },
   "settings": {
     "title": "Ustawienia",
@@ -112,7 +139,14 @@
     "user_add": "Dodaj",
     "user_delete": "Usuń",
     "user_delete_confirm": "Usunąć tego użytkownika? Wszystkie jego sesje zostaną też usunięte.",
-    "saved": "Zapisano"
+    "saved": "Zapisano",
+    "appearance": "Wygląd",
+    "light_theme": "Jasny motyw",
+    "loading_models": "Ładowanie modeli...",
+    "no_models": "Brak modeli",
+    "ollama_unavailable": "Ollama niedostępna",
+    "ollama_available": "Dostępna ({count} modeli)",
+    "ollama_connection_error": "Błąd połączenia z Ollama"
   },
   "units": {
     "pcs": "szt.",
@@ -121,6 +155,47 @@
     "tbsp": "łyżka",
     "tsp": "łyżeczka",
     "pinch": "szczypta"
+  },
+  "meal_types": {
+    "sniadanie": "Śniadanie",
+    "obiad": "Obiad",
+    "kolacja": "Kolacja",
+    "przekaska": "Przekąska"
+  },
+  "tool_calls": {
+    "get_recipes": "Sprawdzam przepisy",
+    "get_stock": "Sprawdzam spiżarnię",
+    "get_products": "Sprawdzam produkty",
+    "save_recipe": "Zapisuję przepis",
+    "add_ingredient_to_recipe": "Dodaję składnik",
+    "add_to_shopping_list": "Dodaję do listy zakupów",
+    "get_shopping_list": "Pobieram listę zakupów",
+    "get_meal_plan": "Sprawdzam plan posiłków",
+    "save_meal_plan_entry": "Zapisuję plan posiłków",
+    "update_memory": "Zapamiętuje informację",
+    "get_memory": "Wczytuję pamięć",
+    "get_recipe_details": "Pobieram szczegóły przepisu"
+  },
+  "theme": {
+    "toggle_light": "Włącz jasny motyw",
+    "toggle_dark": "Włącz ciemny motyw"
+  },
+  "tts": {
+    "disable": "Wyłącz odczyt głosowy",
+    "enable": "Czytaj głośno"
+  },
+  "stt": {
+    "dictate": "Dyktuj",
+    "stop_dictate": "Zatrzymaj dyktowanie"
+  },
+  "session": {
+    "today": "Dziś",
+    "yesterday": "Wczoraj",
+    "delete_session": "Usuń rozmowę"
+  },
+  "user_select": {
+    "title": "Kim jesteś?",
+    "select_prompt": "Wybierz profil, żeby dietetyk znał Twoje preferencje."
   },
   "common": {
     "cancel": "Anuluj",

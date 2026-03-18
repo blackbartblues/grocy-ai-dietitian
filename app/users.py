@@ -82,7 +82,7 @@ def _save_sync(data: dict) -> None:
                 os.unlink(tmp_path)
             except Exception:
                 pass
-        raise RuntimeError(f"Błąd zapisu użytkowników: {e}") from e
+        raise RuntimeError(f"Users save error: {e}") from e
 
 
 def _slugify(name: str) -> str:
@@ -153,7 +153,7 @@ async def update_user(user_id: str, upd: dict) -> dict:
         users = data.get("users", [])
         idx = next((i for i, u in enumerate(users) if u["id"] == user_id), None)
         if idx is None:
-            raise ValueError(f"Użytkownik '{user_id}' nie istnieje.")
+            raise ValueError(f"User '{user_id}' does not exist.")
         allowed = {"name", "avatar", "system_prompt"}
         patch = {k: v for k, v in upd.items() if k in allowed}
         updated_user = {**users[idx], **patch}
@@ -169,7 +169,7 @@ async def delete_user(user_id: str) -> bool:
         data = await asyncio.get_event_loop().run_in_executor(None, _load_sync)
         users = data.get("users", [])
         if len(users) <= 1:
-            raise ValueError("Nie można usunąć ostatniego użytkownika.")
+            raise ValueError("Cannot delete the last user.")
         new_users = [u for u in users if u["id"] != user_id]
         if len(new_users) == len(users):
             return False
@@ -238,7 +238,7 @@ def _save_user_memory_sync(user_id: str, data: dict) -> None:
                 os.unlink(tmp_path)
             except Exception:
                 pass
-        raise RuntimeError(f"Błąd zapisu pamięci użytkownika {user_id}: {e}") from e
+        raise RuntimeError(f"User memory save error {user_id}: {e}") from e
 
 
 async def get_user_memory(user_id: str) -> dict:
