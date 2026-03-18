@@ -22,6 +22,7 @@ DEFAULT_SETTINGS: dict = {
     "system_prompt": "",
     "grocy_url": "",               # NEW: overrides GROCY_BASE_URL env var
     "grocy_api_key": "",           # NEW: overrides GROCY_API_KEY env var
+    "language": "en",              # NEW: 'en' | 'pl'
     "updated_at": "2026-03-16T00:00:00",
 }
 

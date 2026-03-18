@@ -8,6 +8,38 @@ Built to run on your own server (Raspberry Pi, NAS, home server) with no cloud d
 
 ---
 
+## Screenshots
+
+### AI Chat — recipe creation
+![AI Chat](docs/screenshots/01-chat-recipe-creation.png)
+*The AI creates a personalized recipe based on your health profile, checks your pantry, and offers to save it directly to Grocy.*
+
+### Recipe card
+![Recipe card](docs/screenshots/02-recipe-card.png)
+*Each recipe card shows nutritional values per serving — calories, protein, fat, carbs, and fiber.*
+
+### Recipe detail with ingredients
+![Recipe detail](docs/screenshots/04-recipe-detail.png)
+*Full ingredient list with amounts and units, pulled from Grocy.*
+
+### Recipe editor
+![Recipe editor](docs/screenshots/03-recipe-editor.png)
+*Two-column editor: name and description on the left, meal type chips, author, ingredients and nutritional values on the right.*
+
+### Settings — Agent AI
+![Settings Agent AI](docs/screenshots/05-settings-agent-ai.png)
+*Configure the AI engine (Gemini or Ollama), system prompt, and API key — all without restarting the server.*
+
+### Settings — Grocy connection
+![Settings Grocy](docs/screenshots/06-settings-grocy.png)
+*Enter your Grocy URL and API key directly in the UI and test the connection with one click.*
+
+### Settings — User profile
+![Settings User Profile](docs/screenshots/07-settings-user-profile.png)
+*Each family member has their own health profile. The AI reads it before every conversation.*
+
+---
+
 ## What is this?
 
 Dietetyk AI is a personal nutrition assistant that:

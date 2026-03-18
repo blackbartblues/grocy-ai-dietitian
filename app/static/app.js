@@ -33,6 +33,14 @@ function t(key, vars = {}) {
 async function setLanguage(lang) {
   await loadTranslations(lang);
   applyTranslations();
+  // Zapisz język na serwerze — AI użyje właściwego promptu
+  try {
+    await fetch('/api/settings', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ language: lang }),
+    });
+  } catch {}
 }
 window.setLanguage = setLanguage;
 
@@ -2097,6 +2105,16 @@ function selectUser(userId, userName, userAvatar) {
 
 // ===== Init =====
 async function init() {
+  // Pobierz język z serwera (ma priorytet nad localStorage)
+  try {
+    const res = await fetch('/api/settings');
+    const s = await res.json();
+    if (s.language) _lang = s.language;
+    const chatModelSelect = document.getElementById('chat-model-select');
+    if (chatModelSelect && s.gemini_model) {
+      chatModelSelect.value = s.gemini_model;
+    }
+  } catch { /* silent */ }
   await loadTranslations(_lang);
   applyTranslations();
   initTheme();
@@ -2105,18 +2123,6 @@ async function init() {
   startRecipesPolling();
   const _modalSaveBtn = document.getElementById('recipe-modal-save-btn');
   if (_modalSaveBtn) _modalSaveBtn.addEventListener('click', saveRecipeEditModal);
-
-  // Load selected model on startup
-  try {
-    const res = await fetch('/api/settings');
-    if (res.ok) {
-      const settings = await res.json();
-      const chatModelSelect = document.getElementById('chat-model-select');
-      if (chatModelSelect && settings.gemini_model) {
-        chatModelSelect.value = settings.gemini_model;
-      }
-    }
-  } catch { /* silent */ }
 
   // Escape key closes recipe edit modal
   document.addEventListener('keydown', e => {

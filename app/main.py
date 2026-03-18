@@ -87,12 +87,20 @@ class SettingsUpdateRequest(BaseModel):
     system_prompt: Optional[str] = None
     grocy_url: Optional[str] = None        # NEW
     grocy_api_key: Optional[str] = None    # NEW
+    language: Optional[str] = None         # NEW
 
     @field_validator("ai_engine")
     @classmethod
     def validate_engine(cls, v: Optional[str]) -> Optional[str]:
         if v is not None and v not in ("gemini", "ollama"):
             raise ValueError("ai_engine musi być 'gemini' lub 'ollama'.")
+        return v
+
+    @field_validator("language")
+    @classmethod
+    def validate_language(cls, v: Optional[str]) -> Optional[str]:
+        if v is not None and v not in ("en", "pl"):
+            raise ValueError("language must be 'en' or 'pl'.")
         return v
 
 
