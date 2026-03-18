@@ -54,10 +54,9 @@ function applyTranslations() {
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
     el.placeholder = t(el.getAttribute('data-i18n-placeholder'));
   });
-  // Update unit select options
-  document.querySelectorAll('.add-unit-select option, .recipe-modal-add-ing-unit option').forEach(el => {
-    const unitMap = { 'szt.': t('units.pcs'), 'lyzka': t('units.tbsp'), 'lyzeczka': t('units.tsp'), 'szczypta': t('units.pinch') };
-    if (unitMap[el.value]) el.textContent = unitMap[el.value];
+  // Update title attributes
+  document.querySelectorAll('[data-i18n-title]').forEach(el => {
+    el.title = t(el.getAttribute('data-i18n-title'));
   });
 }
 // === end i18n ===
@@ -111,7 +110,7 @@ function initTheme() {
 function applyTheme(theme) {
   document.documentElement.setAttribute("data-theme", theme);
   if (btnTheme) btnTheme.innerHTML = `<span class="mi">${theme === "dark" ? "light_mode" : "dark_mode"}</span>`;
-  btnTheme.title = theme === "dark" ? t('theme.toggle_light') : t('theme.toggle_dark');
+  btnTheme.title = theme === "dark" ? t('theme.enable_light') : t('theme.enable_dark');
   const toggle = document.getElementById("toggle-theme");
   if (toggle) toggle.checked = theme === "light";
   const themeKey = currentUserId ? `dietetyk_theme_${currentUserId}` : "dietetyk_theme";
@@ -171,7 +170,7 @@ function appendTypingIndicator() {
     <div class="typing-indicator">
       <div class="typing-dots">
         <span></span><span></span><span></span>
-        <span style="width:auto;height:auto;background:none;border-radius:0;animation:none;margin-left:6px">${t('chat.thinking')}</span>
+        <span style="width:auto;height:auto;background:none;border-radius:0;animation:none;margin-left:6px">${t('chat.typing')}</span>
       </div>
     </div>`;
   chatMessages.appendChild(el);
@@ -185,7 +184,7 @@ function removeTypingIndicator() {
 
 function appendToolCall(toolName) {
   if (!chatMessages) return;
-  const label = t(`tool_calls.${toolName}`) !== `tool_calls.${toolName}` ? t(`tool_calls.${toolName}`) : toolName;
+  const label = t(`tools.${toolName}`) !== `tools.${toolName}` ? t(`tools.${toolName}`) : toolName;
   const el = document.createElement("div");
   el.className = "message assistant-message";
   el.innerHTML = `<div class="tool-call-indicator"><span class="mi mi-sm">settings</span> ${label}...</div>`;
@@ -232,7 +231,7 @@ async function sendMessage() {
 
     if (!response.ok) {
       removeTypingIndicator();
-      appendMessage("assistant", t('chat.error_connection'));
+      appendMessage("assistant", t('chat.error_server'));
       return;
     }
 
@@ -289,7 +288,7 @@ async function sendMessage() {
     }
   } catch {
     removeTypingIndicator();
-    appendMessage("assistant", t('chat.error_disconnected'));
+    appendMessage("assistant", t('chat.error_connection'));
   } finally {
     isStreaming = false;
     btnSend.disabled = false;
@@ -368,7 +367,7 @@ function setupSpeechRecognition() {
   recognition.onend = () => {
     isRecording = false;
     btnMic.classList.remove("recording");
-    btnMic.title = t('stt.dictate');
+    btnMic.title = t('mic.dictate');
   };
 
   recognition.onerror = () => {
@@ -384,7 +383,7 @@ function setupSpeechRecognition() {
       recognition.start();
       isRecording = true;
       btnMic.classList.add("recording");
-      btnMic.title = t('stt.stop_dictate');
+      btnMic.title = t('mic.stop_dictation');
     }
   });
 }
@@ -456,10 +455,10 @@ function renderPantryItem(item) {
          <span class="qty-value${isInfinite ? ' qty-infinite' : ''}">${isInfinite ? '∞' : item.amount + ' ' + escapeHtml(item.unit)}</span>
          <button class="qty-btn qty-plus${isInfinite ? ' hidden' : ''}" onclick="adjustPantryQty(${item.product_id}, ${item.amount}, ${step}, 1, '${escapeHtml(item.unit)}')">+</button>
        </div>`
-    : `<button class="qty-btn qty-plus qty-add" onclick="quickAddToPantry(${item.product_id}, '${escapeHtml(item.name)}', '${escapeHtml(item.unit)}')">+ ${t('pantry.add_quick')}</button>`;
+    : `<button class="qty-btn qty-plus qty-add" onclick="quickAddToPantry(${item.product_id}, '${escapeHtml(item.name)}', '${escapeHtml(item.unit)}')">+ ${t('pantry.quick_add')}</button>`;
 
   const infiniteBtn = item.in_stock
-    ? `<button class="btn-infinite${isInfinite ? ' active' : ''}" title="${isInfinite ? t('pantry.set_normal') : t('pantry.set_always_available')}" onclick="toggleInfinite(${item.product_id}, ${isInfinite})">∞</button>`
+    ? `<button class="btn-infinite${isInfinite ? ' active' : ''}" title="${isInfinite ? t('pantry.set_normal_amount') : t('pantry.set_always_available')}" onclick="toggleInfinite(${item.product_id}, ${isInfinite})">∞</button>`
     : '';
 
   return `
@@ -509,8 +508,8 @@ async function addMissingToShopping(grocyId, btn) {
     const added = (data.added || []).map(i => i.name);
     const have = data.already_have || [];
     const msg = added.length
-      ? t('shopping.added_to_shopping', { items: added.join(', ') }) + (have.length ? '. ' + t('shopping.already_have', { items: have.join(', ') }) : '')
-      : (have.length ? t('shopping.have_all') : t('shopping.nothing_to_add'));
+      ? t('recipes.added_to_shopping', { items: added.join(', ') }) + (have.length ? '. ' + t('recipes.already_have', { items: have.join(', ') }) : '')
+      : (have.length ? t('recipes.already_have_all') : t('recipes.nothing_to_add'));
     btn.innerHTML = '<span class=\mi mi-sm\>check</span>';
     setTimeout(() => { btn.innerHTML = orig; btn.disabled = false; }, 2500);
     if (document.getElementById('chat-messages') && document.getElementById('chat-messages').style.display !== 'none') {
@@ -900,7 +899,8 @@ function stripMetaBlock(desc) {
 }
 
 function renderRecipeCard(recipe, isSession) {
-  const mealLabel = recipe.meal_type ? (t(`meal_types.${recipe.meal_type}`) !== `meal_types.${recipe.meal_type}` ? t(`meal_types.${recipe.meal_type}`) : recipe.meal_type) : '';
+  const mealTypesMap = { breakfast: t('recipes.meal_type_breakfast'), lunch: t('recipes.meal_type_lunch'), dinner: t('recipes.meal_type_dinner'), snack: t('recipes.meal_type_snack'), '': '' };
+  const mealLabel = mealTypesMap[recipe.meal_type] || '';
   const calories = recipe.calories ? `${recipe.calories} kcal` : '';
   const recipeMeta = [mealLabel, calories].filter(Boolean).join(' · ');
 
@@ -909,7 +909,7 @@ function renderRecipeCard(recipe, isSession) {
   const ingredientsHtml = recipe.ingredients && recipe.ingredients.length
     ? `<div class="recipe-ingredients-accordion" id="${cardId}-ing-acc">
         <button class="recipe-ing-toggle" onclick="toggleIngredients('${cardId}')">
-          <span class="mi mi-sm ing-toggle-icon">chevron_right</span> ${t('recipe_card.ingredients')}
+          <span class="mi mi-sm ing-toggle-icon">chevron_right</span> ${t('recipes.ingredients_label')}
           <span class="ing-count">(${recipe.ingredients.length})</span>
         </button>
         <div class="recipe-ing-list hidden" id="${cardId}-ing-list" data-card-id="${cardId}">
@@ -919,7 +919,7 @@ function renderRecipeCard(recipe, isSession) {
             const name = ing.name || ing.product_name || JSON.stringify(ing);
             const posId = ing.pos_id;
             const deleteBtn = posId && !isSession
-              ? `<button class="btn-delete-ingredient" onclick="deleteRecipeIngredient(${recipe.id}, ${posId}, event)" title="${t('recipe_card.delete_ingredient')}"><span class="mi mi-sm">delete_outline</span></button>`
+              ? `<button class="btn-delete-ingredient" onclick="deleteRecipeIngredient(${recipe.id}, ${posId}, event)" title="${t('recipes.delete_ingredient_tooltip')}"><span class="mi mi-sm">delete_outline</span></button>`
               : '';
             return `<li>${escapeHtml(name)}${amt ? ' — ' + escapeHtml(amt) : ''} ${deleteBtn}</li>`;
           }).join('')}</ul>
@@ -936,27 +936,28 @@ function renderRecipeCard(recipe, isSession) {
 
   const grocy_id = !isSession && recipe.id ? recipe.id : (recipe.grocy_id || null);
   const deleteBtn = grocy_id
-    ? `<button class="icon-btn" onclick="deleteRecipe(${grocy_id}, '${escapeHtml(recipe.name)}', '${cardId}')" title="${t('recipe_card.delete_recipe')}"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button>`
+    ? `<button class="icon-btn" onclick="deleteRecipe(${grocy_id}, '${escapeHtml(recipe.name)}', '${cardId}')" title="${t('recipes.delete_tooltip')}"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button>`
     : '';
 
   const editBtn = grocy_id && !isSession
-    ? `<button class="icon-btn" onclick="openRecipeEditModal(${grocy_id})" title="${t('recipes.edit')}"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></button>`
+    ? `<button class="icon-btn" onclick="openRecipeEditModal(${grocy_id})" title="${t('recipes.edit_tooltip')}"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></button>`
     : '';
 
   const nutritionHtml = nutrition ? `
   <div class="recipe-nutrition">
-    <span class="recipe-nutrition-item" title="${t('recipe_card.calories')}">🔥 ${nutrition.calories} kcal</span>
-    <span class="recipe-nutrition-item" title="${t('recipe_card.protein')}">🥩 ${nutrition.protein}g</span>
-    <span class="recipe-nutrition-item" title="${t('recipe_card.fat')}">🫒 ${nutrition.fat}g</span>
-    <span class="recipe-nutrition-item" title="${t('recipe_card.carbs')}">🌾 ${nutrition.carbs}g</span>
-    <span class="recipe-nutrition-item" title="${t('recipe_card.fiber')}">🌿 ${nutrition.fiber}g</span>
-    <span style="font-size:0.7rem;color:var(--text-muted)">${t('recipe_card.per_serving')}</span>
+    <span class="recipe-nutrition-item" title="${t('recipes.nutrition_calories')}">🔥 ${nutrition.calories} ${t('recipe_editor.nutrition_kcal')}</span>
+    <span class="recipe-nutrition-item" title="${t('recipes.nutrition_protein')}">🥩 ${nutrition.protein}${t('units.g')}</span>
+    <span class="recipe-nutrition-item" title="${t('recipes.nutrition_fat')}">🫒 ${nutrition.fat}${t('units.g')}</span>
+    <span class="recipe-nutrition-item" title="${t('recipes.nutrition_carbs')}">🌾 ${nutrition.carbs}${t('units.g')}</span>
+    <span class="recipe-nutrition-item" title="${t('recipes.nutrition_fiber')}">🌿 ${nutrition.fiber}${t('units.g')}</span>
+    <span style="font-size:0.7rem;color:var(--text-muted)">${t('recipes.per_serving')}</span>
   </div>` : '';
 
   const mealTypeIcons = { sniadanie: 'wb_sunny', obiad: 'restaurant', kolacja: 'nightlight_round', przekaska: 'apple' };
-  function getMealTypeName(mt) { return t(`meal_types.${mt}`) !== `meal_types.${mt}` ? t(`meal_types.${mt}`) : mt; }
-  const metaTagHtml = mealTypes.map(mt =>
-    `<span class="recipe-tag recipe-tag-${mt}"><span class="mi mi-sm">${mealTypeIcons[mt] || 'label'}</span> ${getMealTypeName(mt)}</span>`
+  const mealTypeNames = { sniadanie: t('recipes.meal_type_breakfast'), obiad: t('recipes.meal_type_lunch'), kolacja: t('recipes.meal_type_dinner'), przekaska: t('recipes.meal_type_snack') };
+  // Generuj tagi dla WSZYSTKICH typów
+  const metaTagHtml = mealTypes.map(t =>
+    `<span class="recipe-tag recipe-tag-${t}"><span class="mi mi-sm">${mealTypeIcons[t] || 'label'}</span> ${mealTypeNames[t] || t}</span>`
   ).join('');
   const authorHtml = authorName
     ? `<span class="recipe-author"><span class="mi mi-sm">person</span> ${escapeHtml(authorName)}</span>`
@@ -975,7 +976,7 @@ function renderRecipeCard(recipe, isSession) {
         </div>
         <div class="recipe-card-actions" onclick="event.stopPropagation()">
           ${editBtn}
-          ${grocy_id ? `<button class="icon-btn" onclick="addMissingToShopping(${grocy_id}, this)" title="${t('recipe_card.add_missing_to_shopping')}"><span class="mi mi-sm">add_shopping_cart</span></button>` : ''}
+          ${grocy_id ? `<button class="icon-btn" onclick="addMissingToShopping(${grocy_id}, this)" title="${t('recipes.add_missing_tooltip')}"><span class="mi mi-sm">add_shopping_cart</span></button>` : ''}
           ${deleteBtn}
         </div>
       </div>
@@ -1188,8 +1189,8 @@ function renderModalIngredients() {
   }
   container.innerHTML = _editModalIngredients.map((ing, idx) => {
     const units = ['szt.','g','ml','lyzka','lyzeczka','szczypta'];
-    const unitDisplayMap = { 'szt.': t('units.pcs'), 'lyzka': t('units.tbsp'), 'lyzeczka': t('units.tsp'), 'szczypta': t('units.pinch') };
-    const unitOptions = units.map(u => `<option value="${u}" ${ing.unit === u ? 'selected' : ''}>${unitDisplayMap[u] || u}</option>`).join('');
+    const unitLabelMap = { 'szt.': t('units.pcs'), 'g': t('units.g'), 'ml': t('units.ml'), 'lyzka': t('units.tbsp'), 'lyzeczka': t('units.tsp'), 'szczypta': t('units.pinch') };
+    const unitOptions = units.map(u => `<option value="${u}" ${ing.unit === u ? 'selected' : ''}>${unitLabelMap[u] || u}</option>`).join('');
     return `
       <div class="recipe-modal-ing-row" data-idx="${idx}">
         <span class="recipe-modal-ing-name">${escapeHtml(ing.product_name || ing.name || '')}</span>
@@ -1198,7 +1199,7 @@ function renderModalIngredients() {
         <select class="recipe-modal-ing-unit-sel" onchange="updateModalIng(${idx}, 'unit', this.value)">
           ${unitOptions}
         </select>
-        <button class="recipe-modal-ing-del" onclick="deleteModalIng(${idx})" title="${t('recipe_editor.delete_ingredient')}"><span class="mi mi-sm">delete_outline</span></button>
+        <button class="recipe-modal-ing-del" onclick="deleteModalIng(${idx})" title="${t('recipe_editor.ingredient_delete_tooltip')}"><span class="mi mi-sm">delete_outline</span></button>
       </div>`;
   }).join('');
 }
@@ -1305,7 +1306,7 @@ async function saveRecipeEditModal() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, description: descWithNutrition }),
     });
-    if (!resRecipe.ok) throw new Error(t('recipe_editor.save_error'));
+    if (!resRecipe.ok) throw new Error(t('common.error_generic'));
 
     // 2. Pobierz aktualne składniki z serwera żeby znać pos_id
     const resData = await fetch(`/api/recipes/${_editModalRecipeId}`);
@@ -1502,10 +1503,10 @@ function formatSessionDate(isoString) {
   if (!isoString) return "";
   const d = new Date(isoString);
   const now = new Date();
-  const diffDays = Math.floor((now - d) / 86400000);
   const locale = _lang === 'pl' ? 'pl-PL' : 'en-US';
-  if (diffDays === 0) return t('session.today') + ", " + d.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" });
-  if (diffDays === 1) return t('session.yesterday');
+  const diffDays = Math.floor((now - d) / 86400000);
+  if (diffDays === 0) return t('sessions.today') + ", " + d.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" });
+  if (diffDays === 1) return t('sessions.yesterday');
   if (diffDays < 7) return d.toLocaleDateString(locale, { weekday: "long" });
   return d.toLocaleDateString(locale, { day: "numeric", month: "short" });
 }
@@ -1533,7 +1534,7 @@ function renderSessions(sessions) {
         <div class="session-title"><span class="mi mi-sm">chat_bubble_outline</span> ${DOMPurify ? DOMPurify.sanitize(s.title || t('chat.session_default')) : escapeHtml(s.title || t('chat.session_default'))}</div>
         <div class="session-meta">${formatSessionDate(s.updated_at)} · ${s.message_count || 0} ${t('chat.messages_short')}</div>
       </div>
-      <button class="session-delete" title="${t('session.delete_session')}"
+      <button class="session-delete" title="${t('sessions.delete_tooltip')}"
               onclick="deleteSession(event, '${s.id}')"><span class="mi mi-sm">close</span></button>
     </div>
   `).join("");
@@ -1589,7 +1590,7 @@ function startNewChat() {
   chatMessages.innerHTML = `
     <div class="message assistant-message">
       <div class="message-content">
-        <p>${t('chat.new_chat_greeting')}</p>
+        <p>${t('chat.new_conversation_greeting')}</p>
       </div>
     </div>`;
 
@@ -1945,14 +1946,14 @@ async function loadOllamaModels(currentModel = null) {
   const text = document.getElementById("ollama-status-text");
 
   if (!select) return;
-  select.innerHTML = `<option value="">${t('settings.loading_models')}</option>`;
+  select.innerHTML = `<option value="">${t('settings.ollama_loading')}</option>`;
 
   try {
     const res = await fetch("/api/ollama/models");
     const data = await res.json();
 
     if (data.error || !data.models || data.models.length === 0) {
-      select.innerHTML = `<option value="">${t('settings.no_models')}</option>`;
+      select.innerHTML = `<option value="">${t('settings.ollama_no_models')}</option>`;
       if (dot) { dot.className = "status-dot offline"; }
       if (text) text.textContent = t('settings.ollama_unavailable');
     } else {
@@ -1960,12 +1961,12 @@ async function loadOllamaModels(currentModel = null) {
         `<option value="${escapeHtml(m)}" ${m === currentModel ? "selected" : ""}>${escapeHtml(m)}</option>`
       ).join("");
       if (dot) { dot.className = "status-dot online"; }
-      if (text) text.textContent = t('settings.ollama_available', { count: String(data.models.length) });
+      if (text) text.textContent = t('settings.ollama_available', { count: data.models.length });
     }
   } catch {
-    select.innerHTML = `<option value="">${t('settings.ollama_connection_error')}</option>`;
+    select.innerHTML = `<option value="">${t('settings.ollama_error')}</option>`;
     if (dot) { dot.className = "status-dot offline"; }
-    if (text) text.textContent = t('settings.ollama_connection_error');
+    if (text) text.textContent = t('settings.ollama_error_detail');
   }
 }
 
@@ -2454,27 +2455,27 @@ async function saveConnectionSettings() {
       setTimeout(() => { statusEl.innerHTML = ''; }, 3000);
     }
   } catch {
-    alert('Save error.');
+    alert(t('settings.save_error'));
   }
 }
 window.saveConnectionSettings = saveConnectionSettings;
 
 async function testGrocyConnection() {
   const statusEl = document.getElementById('grocy-connection-status');
-  if (statusEl) statusEl.innerHTML = '<span class="mi mi-sm" style="animation:spin 1s linear infinite">refresh</span> Testing...';
+  if (statusEl) statusEl.innerHTML = `<span class="mi mi-sm" style="animation:spin 1s linear infinite">refresh</span> ${t('settings.testing')}`;
   try {
     await saveConnectionSettings();
     const res = await fetch('/health');
     const data = await res.json();
     if (statusEl) {
       if (data.grocy === 'connected') {
-        statusEl.innerHTML = '<span style="color:var(--md-primary)"><span class="mi mi-sm">check_circle</span> Connected to ' + escapeHtml(data.grocy_url || 'Grocy') + '</span>';
+        statusEl.innerHTML = `<span style="color:var(--md-primary)"><span class="mi mi-sm">check_circle</span> ${t('settings.connected_to', { url: escapeHtml(data.grocy_url || 'Grocy') })}</span>`;
       } else {
-        statusEl.innerHTML = '<span style="color:var(--md-error,#f28b82)"><span class="mi mi-sm">error</span> Cannot connect. Check URL and API key.</span>';
+        statusEl.innerHTML = `<span style="color:var(--md-error,#f28b82)"><span class="mi mi-sm">error</span> ${t('settings.cannot_connect')}</span>`;
       }
     }
   } catch {
-    if (statusEl) statusEl.innerHTML = '<span style="color:var(--md-error,#f28b82)"><span class="mi mi-sm">error</span> Connection test failed.</span>';
+    if (statusEl) statusEl.innerHTML = `<span style="color:var(--md-error,#f28b82)"><span class="mi mi-sm">error</span> ${t('settings.connection_test_failed')}</span>`;
   }
 }
 window.testGrocyConnection = testGrocyConnection;

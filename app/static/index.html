@@ -18,14 +18,14 @@
             <span class="logo"><span class="mi mi-lg">nutrition</span></span>
             <h1 data-i18n="header.title">Diet AI</h1>
         </div>
-        <div id="header-user" class="header-user" title="Change user" style="display:none">
+        <div id="header-user" class="header-user" title="Change user" data-i18n-title="header.change_user" style="display:none">
             <span class="header-user-avatar" id="header-user-avatar">👤</span>
             <span id="header-user-name">—</span>
         </div>
         <div class="header-controls">
-            <button id="btn-theme" class="btn-icon" title="Toggle theme" aria-label="Toggle dark/light theme"><span class="mi">dark_mode</span></button>
-            <button id="btn-tts" class="btn-icon" title="Read aloud" aria-label="Toggle text-to-speech"><span class="mi">volume_up</span></button>
-            <button id="btn-settings" class="btn-icon" title="Settings" aria-label="Open settings"><span class="mi">settings</span></button>
+            <button id="btn-theme" class="btn-icon" title="Toggle theme" data-i18n-title="header.toggle_theme" aria-label="Toggle dark/light theme"><span class="mi">dark_mode</span></button>
+            <button id="btn-tts" class="btn-icon" title="Read aloud" data-i18n-title="header.read_aloud" aria-label="Toggle text-to-speech"><span class="mi">volume_up</span></button>
+            <button id="btn-settings" class="btn-icon" title="Settings" data-i18n-title="nav.settings" aria-label="Open settings"><span class="mi">settings</span></button>
         </div>
     </header>
 
@@ -68,7 +68,7 @@
                 </div>
                 <div class="chat-input-bar">
                     <button id="btn-send" class="btn-send" aria-label="Send message"><span class="mi">send</span></button>
-                    <select id="chat-model-select" class="chat-model-select" title="Select AI model">
+                    <select id="chat-model-select" class="chat-model-select" title="Select AI model" data-i18n-title="header.select_model">
                         <option value="gemini-2.5-flash">2.5 Flash</option>
                         <option value="gemini-2.5-flash:thinking">2.5 Flash 💭</option>
                         <option value="gemini-2.5-pro">2.5 Pro</option>
@@ -95,14 +95,14 @@
             <div id="tab-recipes" class="tab-content">
               <div class="recipes-content">
                 <div class="recipes-section">
-                    <h3 class="section-title">Session</h3>
+                    <h3 class="section-title" data-i18n="recipes.section_session">Session</h3>
                     <div id="session-recipes" class="recipes-list">
                         <p class="empty-state" data-i18n="recipes.empty">No recipes yet. Ask the AI to create one!</p>
                     </div>
                 </div>
                 <hr class="recipes-separator">
                 <div class="recipes-section">
-                    <h3 class="section-title">Grocy</h3>
+                    <h3 class="section-title" data-i18n="recipes.section_grocy">Grocy</h3>
 <div class="recipes-controls">
                   <select id="recipe-filter-select" class="recipe-sort-select">
                     <option value="all" data-i18n="recipes.filter_all">All</option>
@@ -133,23 +133,23 @@
                 </div>
                 <input id="shopping-amount" type="number" value="1" min="0" step="0.1" class="add-amount-input" />
                 <select id="shopping-unit" class="add-unit-select">
-                  <option value="szt.">pcs.</option>
-                  <option value="g">g</option>
-                  <option value="ml">ml</option>
-                  <option value="lyzka">tbsp</option>
-                  <option value="lyzeczka">tsp</option>
-                  <option value="szczypta">pinch</option>
-                  <option value="kg">kg</option>
-                  <option value="l">l</option>
+                  <option value="szt." data-i18n="units.pcs">pcs.</option>
+                  <option value="g" data-i18n="units.g">g</option>
+                  <option value="ml" data-i18n="units.ml">ml</option>
+                  <option value="lyzka" data-i18n="units.tbsp">tbsp</option>
+                  <option value="lyzeczka" data-i18n="units.tsp">tsp</option>
+                  <option value="szczypta" data-i18n="units.pinch">pinch</option>
+                  <option value="kg" data-i18n="units.kg">kg</option>
+                  <option value="l" data-i18n="units.l">l</option>
                 </select>
                 <button id="btn-shopping-add" class="btn-add">+ <span data-i18n="shopping.add_button">Add</span></button>
               </div>
               <div class="list-header-row">
-                <input type="text" id="shopping-search" placeholder="Search list..." data-i18n-placeholder="shopping.add_placeholder" />
+                <input type="text" id="shopping-search" placeholder="Search list..." data-i18n-placeholder="shopping.search_placeholder" />
                 <div class="list-filters">
-                  <button class="list-filter-btn active" data-filter="all">All</button>
-                  <button class="list-filter-btn" data-filter="pending">Pending</button>
-                  <button class="list-filter-btn" data-filter="done">Done ✓</button>
+                  <button class="list-filter-btn active" data-filter="all" data-i18n="shopping.filter_all">All</button>
+                  <button class="list-filter-btn" data-filter="pending" data-i18n="shopping.filter_pending">Pending</button>
+                  <button class="list-filter-btn" data-filter="done" data-i18n="shopping.filter_done">Done</button>
                 </div>
                 <button id="btn-shopping-refresh" class="btn-refresh">↻</button>
               </div>
@@ -170,19 +170,19 @@
                 </div>
                 <input id="pantry-add-amount" type="number" value="1" min="0" step="0.1" class="add-amount-input" />
                 <select id="pantry-add-unit" class="add-unit-select">
-                  <option value="szt.">pcs.</option>
-                  <option value="g">g</option>
-                  <option value="ml">ml</option>
-                  <option value="lyzka">tbsp</option>
-                  <option value="lyzeczka">tsp</option>
-                  <option value="szczypta">pinch</option>
-                  <option value="kg">kg</option>
-                  <option value="l">l</option>
+                  <option value="szt." data-i18n="units.pcs">pcs.</option>
+                  <option value="g" data-i18n="units.g">g</option>
+                  <option value="ml" data-i18n="units.ml">ml</option>
+                  <option value="lyzka" data-i18n="units.tbsp">tbsp</option>
+                  <option value="lyzeczka" data-i18n="units.tsp">tsp</option>
+                  <option value="szczypta" data-i18n="units.pinch">pinch</option>
+                  <option value="kg" data-i18n="units.kg">kg</option>
+                  <option value="l" data-i18n="units.l">l</option>
                 </select>
                 <button id="btn-pantry-add" class="btn-add">+ <span data-i18n="pantry.add_button">Add</span></button>
               </div>
               <div class="list-header-row">
-                <input type="text" id="pantry-search" placeholder="Search pantry..." data-i18n-placeholder="pantry.add_placeholder" />
+                <input type="text" id="pantry-search" placeholder="Search pantry..." data-i18n-placeholder="pantry.search_placeholder" />
                 <div class="pantry-filters list-filters">
                   <button class="pantry-filter-btn list-filter-btn active" data-filter="all" data-i18n="pantry.filter_all">All</button>
                   <button class="pantry-filter-btn list-filter-btn" data-filter="have" data-i18n="pantry.filter_have">In stock ✓</button>
@@ -243,11 +243,11 @@
                 <div class="settings-agent-grid">
                   <div class="settings-agent-left">
                     <label class="settings-label" data-i18n="settings.system_prompt_label">System Prompt</label>
-                    <p class="settings-hint">Configure AI personality. Leave empty to use the default dietitian prompt.</p>
+                    <p class="settings-hint" data-i18n="settings.system_prompt_hint">Configure AI personality. Leave empty to use the default dietitian prompt.</p>
                     <textarea id="system-prompt-edit" class="settings-prompt-textarea" placeholder="Leave empty = default Diet AI prompt..." data-i18n-placeholder="settings.system_prompt_placeholder"></textarea>
                     <div class="settings-prompt-actions">
                       <button class="btn-md3-filled" id="btn-save-system-prompt"><span class="mi mi-sm">save</span> <span data-i18n="settings.save_prompt">Save prompt</span></button>
-                      <button class="btn-md3-outlined" id="btn-reset-system-prompt"><span class="mi mi-sm">restart_alt</span> Reset</button>
+                      <button class="btn-md3-outlined" id="btn-reset-system-prompt"><span class="mi mi-sm">restart_alt</span> <span data-i18n="settings.reset_prompt">Reset</span></button>
                     </div>
                   </div>
                   <div class="settings-agent-right">
@@ -256,16 +256,16 @@
                       <label class="settings-engine-card" id="radio-gemini">
                         <input type="radio" name="ai-engine" value="gemini">
                         <span class="mi">auto_awesome</span>
-                        <span class="settings-engine-name">Gemini API</span>
+                        <span class="settings-engine-name" data-i18n="settings.engine_gemini">Gemini API</span>
                       </label>
                       <label class="settings-engine-card" id="radio-ollama">
                         <input type="radio" name="ai-engine" value="ollama">
                         <span class="mi">computer</span>
-                        <span class="settings-engine-name">Ollama (local)</span>
+                        <span class="settings-engine-name" data-i18n="settings.engine_ollama">Ollama (local)</span>
                       </label>
                     </div>
                     <div id="gemini-options" class="settings-engine-detail">
-                      <label class="settings-label">Gemini Model</label>
+                      <label class="settings-label" data-i18n="settings.gemini_model_label">Gemini Model</label>
                       <select id="gemini-model" class="md3-select">
                         <option value="gemini-2.5-flash">2.5 Flash</option>
                         <option value="gemini-2.5-flash:thinking">2.5 Flash Thinking</option>
@@ -281,23 +281,24 @@
                       <div style="display:flex;gap:8px;align-items:center">
                         <input type="password" id="settings-gemini-api-key"
                           class="recipe-modal-input" style="flex:1"
-                          placeholder="AIza... (leave empty to use server env var)" />
+                          placeholder="AIza... (leave empty to use server env var)"
+                          data-i18n-placeholder="settings.gemini_key_placeholder" />
                         <button class="btn-md3-outlined" onclick="toggleGeminiKeyVisibility()">
                           <span class="mi mi-sm" id="gemini-key-eye-icon">visibility</span>
                         </button>
                       </div>
-                      <span class="settings-hint">Optional. Overrides server GEMINI_API_KEY environment variable.</span>
+                      <span class="settings-hint" data-i18n="settings.gemini_key_hint">Optional. Overrides server GEMINI_API_KEY environment variable.</span>
                     </div>
                     <div id="ollama-options" class="settings-engine-detail" style="display:none">
-                      <label class="settings-label">Ollama URL</label>
+                      <label class="settings-label" data-i18n="settings.ollama_url_label">Ollama URL</label>
                       <input type="text" id="ollama-url" class="recipe-modal-input" value="http://192.168.1.28:11434">
-                      <label class="settings-label" style="margin-top:10px">Ollama Model</label>
+                      <label class="settings-label" style="margin-top:10px" data-i18n="settings.ollama_model_label">Ollama Model</label>
                       <select id="ollama-model" class="md3-select">
-                        <option value="">Loading models...</option>
+                        <option value="" data-i18n="settings.ollama_loading">Loading models...</option>
                       </select>
                       <div class="ollama-status" style="margin-top:8px">
                         <div class="status-dot" id="ollama-status-dot"></div>
-                        <span id="ollama-status-text">Checking...</span>
+                        <span id="ollama-status-text" data-i18n="settings.testing">Testing...</span>
                       </div>
                     </div>
                     <button class="btn-md3-filled" id="btn-save-settings" style="margin-top:16px; width:100%">
@@ -305,9 +306,9 @@
                     </button>
                     <!-- Appearance -->
                     <div style="margin-top:20px; padding-top:16px; border-top:1px solid var(--md-outline-variant)">
-                      <label class="settings-label">Appearance</label>
+                      <label class="settings-label" data-i18n="settings.appearance_label">Appearance</label>
                       <div class="toggle-group">
-                        <span class="toggle-label">Light theme</span>
+                        <span class="toggle-label" data-i18n="settings.theme_light">Light theme</span>
                         <label class="toggle-switch">
                           <input type="checkbox" id="toggle-theme">
                           <span class="toggle-slider"></span>
@@ -377,11 +378,11 @@
     <div id="modal-user-select" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-label="Select user">
         <div class="modal" style="max-width:400px">
             <div class="modal-header">
-                <h2>Who are you?</h2>
+                <h2 data-i18n="user_select.title">Who are you?</h2>
                 <button class="modal-close" id="btn-close-user-select" aria-label="Skip"><span class="mi mi-sm">close</span></button>
             </div>
             <div class="modal-body">
-                <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:14px">
+                <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:14px" data-i18n="user_select.hint">
                     Select a profile so the dietitian knows your preferences.
                 </p>
                 <div id="user-select-grid" class="user-select-grid"></div>
@@ -454,12 +455,12 @@
                 </div>
                 <input type="number" id="recipe-modal-ing-amount" class="recipe-modal-add-ing-qty" value="1" min="0" step="0.1" />
                 <select id="recipe-modal-ing-unit" class="recipe-modal-add-ing-unit">
-                  <option value="szt.">pcs.</option>
-                  <option value="g">g</option>
-                  <option value="ml">ml</option>
-                  <option value="lyzka">tbsp</option>
-                  <option value="lyzeczka">tsp</option>
-                  <option value="szczypta">pinch</option>
+                  <option value="szt." data-i18n="units.pcs">pcs.</option>
+                  <option value="g" data-i18n="units.g">g</option>
+                  <option value="ml" data-i18n="units.ml">ml</option>
+                  <option value="lyzka" data-i18n="units.tbsp">tbsp</option>
+                  <option value="lyzeczka" data-i18n="units.tsp">tsp</option>
+                  <option value="szczypta" data-i18n="units.pinch">pinch</option>
                 </select>
                 <button id="recipe-modal-ing-add-btn" class="recipe-modal-add-ing-btn" type="button">
                   <span class="mi mi-sm">add</span> <span data-i18n="recipe_editor.ingredient_add">Add</span>

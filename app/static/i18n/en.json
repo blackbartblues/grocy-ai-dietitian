@@ -8,7 +8,11 @@
     "settings": "Settings"
   },
   "header": {
-    "title": "Diet AI"
+    "title": "Diet AI",
+    "change_user": "Change user",
+    "toggle_theme": "Toggle theme",
+    "read_aloud": "Read aloud",
+    "select_model": "Select AI model"
   },
   "chat": {
     "placeholder": "Ask about nutrition, meal plan, recipes...",
@@ -16,10 +20,11 @@
     "thinking": "Thinking...",
     "empty_state": "Start a conversation with your AI dietitian.",
     "session_default": "Conversation",
-    "new_chat_greeting": "Hi! New conversation. How can I help you today?",
-    "error_connection": "Server connection error. Please try again.",
-    "error_disconnected": "Connection error. Check if the server is running.",
-    "messages_short": "msg."
+    "new_conversation_greeting": "Hi! New conversation. How can I help you today?",
+    "error_server": "Server connection error. Please try again.",
+    "error_connection": "Connection error. Check if the server is running.",
+    "messages_short": "msg.",
+    "typing": "Dietitian is typing..."
   },
   "recipes": {
     "title": "Recipes",
@@ -33,27 +38,32 @@
     "sort_type": "Type",
     "sort_author": "Author",
     "add_missing_to_shopping": "Add missing to shopping list",
+    "add_missing_tooltip": "Add missing ingredients to shopping",
     "edit": "Edit recipe",
     "delete": "Delete",
     "delete_confirm": "Delete this recipe?",
+    "delete_tooltip": "Delete recipe",
     "meal_type_breakfast": "Breakfast",
     "meal_type_lunch": "Lunch",
     "meal_type_dinner": "Dinner",
     "meal_type_snack": "Snack",
+    "section_session": "Session",
+    "section_grocy": "Grocy",
+    "ingredients_label": "INGREDIENTS",
+    "preparation": "Preparation",
     "no_details": "No details",
-    "preparation": "Preparation method"
-  },
-  "recipe_card": {
-    "ingredients": "INGREDIENTS",
     "per_serving": "/ serving",
-    "calories": "Calories",
-    "protein": "Protein",
-    "fat": "Fat",
-    "carbs": "Carbs",
-    "fiber": "Fiber",
-    "delete_ingredient": "Delete ingredient",
-    "delete_recipe": "Delete recipe",
-    "add_missing_to_shopping": "Add missing ingredients to shopping"
+    "added_to_shopping": "Added to shopping: {items}",
+    "already_have": "Already have: {items}",
+    "already_have_all": "You already have all ingredients!",
+    "nothing_to_add": "No ingredients to add",
+    "delete_ingredient_tooltip": "Delete ingredient",
+    "edit_tooltip": "Edit recipe",
+    "nutrition_calories": "Calories",
+    "nutrition_protein": "Protein",
+    "nutrition_fat": "Fat",
+    "nutrition_carbs": "Carbs",
+    "nutrition_fiber": "Fiber"
   },
   "recipe_editor": {
     "title_edit": "Edit Recipe",
@@ -66,6 +76,7 @@
     "ingredients_label": "Ingredients",
     "ingredient_name_placeholder": "Ingredient name...",
     "ingredient_add": "Add",
+    "ingredient_delete_tooltip": "Delete ingredient",
     "nutrition_label": "Nutritional values (per serving)",
     "nutrition_kcal": "kcal",
     "nutrition_protein": "protein (g)",
@@ -73,9 +84,7 @@
     "nutrition_carbs": "carbs (g)",
     "nutrition_fiber": "fiber (g)",
     "save": "Save",
-    "cancel": "Cancel",
-    "delete_ingredient": "Delete ingredient",
-    "save_error": "Recipe save error"
+    "cancel": "Cancel"
   },
   "shopping": {
     "title": "Shopping List",
@@ -85,10 +94,10 @@
     "complete_done": "Move done to pantry",
     "complete_done_confirm": "Move all checked items to pantry?",
     "delete_confirm": "Remove this item?",
-    "added_to_shopping": "Added to shopping: {items}",
-    "already_have": "Already have: {items}",
-    "have_all": "You already have all ingredients!",
-    "nothing_to_add": "No ingredients to add"
+    "filter_all": "All",
+    "filter_pending": "Pending",
+    "filter_done": "Done",
+    "search_placeholder": "Search list..."
   },
   "pantry": {
     "title": "Pantry",
@@ -99,9 +108,10 @@
     "filter_have": "In stock",
     "filter_missing": "Missing",
     "delete_confirm": "Remove from pantry?",
-    "add_quick": "Add",
-    "set_normal": "Set normal amount",
-    "set_always_available": "Set as always available"
+    "quick_add": "Add",
+    "set_normal_amount": "Set normal amount",
+    "set_always_available": "Set as always available",
+    "search_placeholder": "Search pantry..."
   },
   "settings": {
     "title": "Settings",
@@ -112,11 +122,24 @@
     "agent_title": "Agent AI",
     "system_prompt_label": "System Prompt",
     "system_prompt_placeholder": "System instruction for the assistant...",
+    "system_prompt_hint": "Configure AI personality. Leave empty to use the default dietitian prompt.",
     "save_prompt": "Save prompt",
+    "reset_prompt": "Reset",
     "ai_engine_label": "AI Engine",
+    "engine_gemini": "Gemini API",
+    "engine_ollama": "Ollama (local)",
+    "gemini_model_label": "Gemini Model",
     "gemini_key_label": "Gemini API Key",
     "gemini_key_placeholder": "AIza... (leave empty to use server env var)",
     "gemini_key_hint": "Optional. Overrides server GEMINI_API_KEY environment variable.",
+    "ollama_url_label": "Ollama URL",
+    "ollama_model_label": "Ollama Model",
+    "ollama_loading": "Loading models...",
+    "ollama_no_models": "No models",
+    "ollama_unavailable": "Ollama unavailable",
+    "ollama_available": "Available ({count} models)",
+    "ollama_error": "Connection error",
+    "ollama_error_detail": "Connection error with Ollama",
     "connections_title": "Grocy Connection",
     "grocy_url_label": "Grocy URL",
     "grocy_url_placeholder": "http://192.168.1.100:9283",
@@ -124,11 +147,16 @@
     "grocy_key_placeholder": "Your Grocy API key",
     "grocy_key_hint": "Find your API key in Grocy → Manage API keys.",
     "save": "Save",
+    "save_error": "Save error.",
     "test_connection": "Test connection",
+    "testing": "Testing...",
     "connected": "Connected",
+    "connected_to": "Connected to {url}",
     "not_configured": "Not configured",
     "cannot_connect": "Cannot connect. Check URL and API key.",
     "connection_test_failed": "Connection test failed.",
+    "appearance_label": "Appearance",
+    "theme_light": "Light theme",
     "user_title_edit": "Edit profile",
     "user_title_new": "New user",
     "user_name_placeholder": "User name...",
@@ -139,14 +167,7 @@
     "user_add": "Add",
     "user_delete": "Delete",
     "user_delete_confirm": "Delete this user? All their sessions will also be deleted.",
-    "saved": "Saved",
-    "appearance": "Appearance",
-    "light_theme": "Light theme",
-    "loading_models": "Loading models...",
-    "no_models": "No models",
-    "ollama_unavailable": "Ollama unavailable",
-    "ollama_available": "Available ({count} models)",
-    "ollama_connection_error": "Ollama connection error"
+    "saved": "Saved"
   },
   "units": {
     "pcs": "pcs.",
@@ -154,48 +175,9 @@
     "ml": "ml",
     "tbsp": "tbsp",
     "tsp": "tsp",
-    "pinch": "pinch"
-  },
-  "meal_types": {
-    "sniadanie": "Breakfast",
-    "obiad": "Lunch",
-    "kolacja": "Dinner",
-    "przekaska": "Snack"
-  },
-  "tool_calls": {
-    "get_recipes": "Checking recipes",
-    "get_stock": "Checking pantry",
-    "get_products": "Checking products",
-    "save_recipe": "Saving recipe",
-    "add_ingredient_to_recipe": "Adding ingredient",
-    "add_to_shopping_list": "Adding to shopping list",
-    "get_shopping_list": "Loading shopping list",
-    "get_meal_plan": "Checking meal plan",
-    "save_meal_plan_entry": "Saving meal plan",
-    "update_memory": "Remembering information",
-    "get_memory": "Loading memory",
-    "get_recipe_details": "Loading recipe details"
-  },
-  "theme": {
-    "toggle_light": "Switch to light theme",
-    "toggle_dark": "Switch to dark theme"
-  },
-  "tts": {
-    "disable": "Disable voice reading",
-    "enable": "Read aloud"
-  },
-  "stt": {
-    "dictate": "Dictate",
-    "stop_dictate": "Stop dictation"
-  },
-  "session": {
-    "today": "Today",
-    "yesterday": "Yesterday",
-    "delete_session": "Delete conversation"
-  },
-  "user_select": {
-    "title": "Who are you?",
-    "select_prompt": "Select a profile so the dietitian knows your preferences."
+    "pinch": "pinch",
+    "kg": "kg",
+    "l": "l"
   },
   "common": {
     "cancel": "Cancel",
@@ -215,5 +197,43 @@
     "label": "Language",
     "en": "English",
     "pl": "Polski"
+  },
+  "user_select": {
+    "title": "Who are you?",
+    "hint": "Select a profile so the dietitian knows your preferences.",
+    "select_user": "Select user"
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "enable_light": "Enable light theme",
+    "enable_dark": "Enable dark theme"
+  },
+  "mic": {
+    "dictate": "Dictate",
+    "stop_dictation": "Stop dictation"
+  },
+  "tts": {
+    "disable": "Disable read aloud",
+    "enable": "Read aloud"
+  },
+  "tools": {
+    "get_recipes": "Checking recipes",
+    "get_stock": "Checking pantry",
+    "get_products": "Checking products",
+    "save_recipe": "Saving recipe",
+    "add_ingredient_to_recipe": "Adding ingredient",
+    "add_to_shopping_list": "Adding to shopping list",
+    "get_shopping_list": "Getting shopping list",
+    "get_meal_plan": "Checking meal plan",
+    "save_meal_plan_entry": "Saving meal plan",
+    "update_memory": "Remembering information",
+    "get_memory": "Loading memory",
+    "get_recipe_details": "Getting recipe details"
+  },
+  "sessions": {
+    "delete_tooltip": "Delete conversation",
+    "today": "Today",
+    "yesterday": "Yesterday"
   }
 }

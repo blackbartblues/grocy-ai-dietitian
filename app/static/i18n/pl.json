@@ -8,7 +8,11 @@
     "settings": "Ustawienia"
   },
   "header": {
-    "title": "Dietetyk AI"
+    "title": "Dietetyk AI",
+    "change_user": "Zmień użytkownika",
+    "toggle_theme": "Zmień motyw",
+    "read_aloud": "Czytaj głośno",
+    "select_model": "Wybierz model AI"
   },
   "chat": {
     "placeholder": "Zapytaj o dietę, jadłospis, przepisy...",
@@ -16,10 +20,11 @@
     "thinking": "Myślę...",
     "empty_state": "Rozpocznij rozmowę ze swoim asystentem dietetycznym.",
     "session_default": "Rozmowa",
-    "new_chat_greeting": "Cześć! Nowa rozmowa. Czym mogę Ci dziś pomóc?",
-    "error_connection": "Błąd połączenia z serwerem. Spróbuj ponownie.",
-    "error_disconnected": "Błąd połączenia. Sprawdź czy serwer działa.",
-    "messages_short": "wiad."
+    "new_conversation_greeting": "Cześć! Nowa rozmowa. Czym mogę Ci dziś pomóc?",
+    "error_server": "Błąd połączenia z serwerem. Spróbuj ponownie.",
+    "error_connection": "Błąd połączenia. Sprawdź czy serwer działa.",
+    "messages_short": "wiad.",
+    "typing": "Dietetyk pisze..."
   },
   "recipes": {
     "title": "Przepisy",
@@ -33,27 +38,32 @@
     "sort_type": "Typ",
     "sort_author": "Autor",
     "add_missing_to_shopping": "Dodaj brakujące do zakupów",
+    "add_missing_tooltip": "Brakujące składniki do zakupów",
     "edit": "Edytuj przepis",
     "delete": "Usuń",
     "delete_confirm": "Usunąć ten przepis?",
+    "delete_tooltip": "Usuń przepis",
     "meal_type_breakfast": "Śniadanie",
     "meal_type_lunch": "Obiad",
     "meal_type_dinner": "Kolacja",
     "meal_type_snack": "Przekąska",
+    "section_session": "Sesja",
+    "section_grocy": "Grocy",
+    "ingredients_label": "SKŁADNIKI",
+    "preparation": "Sposób przygotowania",
     "no_details": "Brak szczegółów",
-    "preparation": "Sposób przygotowania"
-  },
-  "recipe_card": {
-    "ingredients": "SKŁADNIKI",
     "per_serving": "/ porcja",
-    "calories": "Kalorie",
-    "protein": "Białko",
-    "fat": "Tłuszcz",
-    "carbs": "Węglowodany",
-    "fiber": "Błonnik",
-    "delete_ingredient": "Usuń składnik",
-    "delete_recipe": "Usuń przepis",
-    "add_missing_to_shopping": "Brakujące składniki do zakupów"
+    "added_to_shopping": "Dodano do zakupów: {items}",
+    "already_have": "Masz już: {items}",
+    "already_have_all": "Masz już wszystkie składniki!",
+    "nothing_to_add": "Brak składników do dodania",
+    "delete_ingredient_tooltip": "Usuń składnik",
+    "edit_tooltip": "Edytuj przepis",
+    "nutrition_calories": "Kalorie",
+    "nutrition_protein": "Białko",
+    "nutrition_fat": "Tłuszcz",
+    "nutrition_carbs": "Węglowodany",
+    "nutrition_fiber": "Błonnik"
   },
   "recipe_editor": {
     "title_edit": "Edytuj przepis",
@@ -66,6 +76,7 @@
     "ingredients_label": "Składniki",
     "ingredient_name_placeholder": "Nazwa składnika...",
     "ingredient_add": "Dodaj",
+    "ingredient_delete_tooltip": "Usuń składnik",
     "nutrition_label": "Wartości odżywcze (na porcję)",
     "nutrition_kcal": "kcal",
     "nutrition_protein": "białko (g)",
@@ -73,9 +84,7 @@
     "nutrition_carbs": "węglowodany (g)",
     "nutrition_fiber": "błonnik (g)",
     "save": "Zapisz",
-    "cancel": "Anuluj",
-    "delete_ingredient": "Usuń składnik",
-    "save_error": "Błąd zapisu przepisu"
+    "cancel": "Anuluj"
   },
   "shopping": {
     "title": "Lista zakupów",
@@ -85,10 +94,10 @@
     "complete_done": "Przenieś kupione do spiżarni",
     "complete_done_confirm": "Przenieść wszystkie zaznaczone do spiżarni?",
     "delete_confirm": "Usunąć ten wpis?",
-    "added_to_shopping": "Dodano do zakupów: {items}",
-    "already_have": "Masz już: {items}",
-    "have_all": "Masz już wszystkie składniki!",
-    "nothing_to_add": "Brak składników do dodania"
+    "filter_all": "Wszystkie",
+    "filter_pending": "Oczekujące",
+    "filter_done": "Kupione",
+    "search_placeholder": "Szukaj na liście..."
   },
   "pantry": {
     "title": "Spiżarnia",
@@ -99,9 +108,10 @@
     "filter_have": "Mam",
     "filter_missing": "Brakuje",
     "delete_confirm": "Usunąć ze spiżarni?",
-    "add_quick": "Dodaj",
-    "set_normal": "Ustaw normalną ilość",
-    "set_always_available": "Ustaw jako zawsze dostępny"
+    "quick_add": "Dodaj",
+    "set_normal_amount": "Ustaw normalną ilość",
+    "set_always_available": "Ustaw jako zawsze dostępny",
+    "search_placeholder": "Szukaj w spiżarni..."
   },
   "settings": {
     "title": "Ustawienia",
@@ -112,11 +122,24 @@
     "agent_title": "Agent AI",
     "system_prompt_label": "System Prompt",
     "system_prompt_placeholder": "Instrukcja systemowa dla asystenta...",
+    "system_prompt_hint": "Skonfiguruj osobowość AI. Zostaw puste aby użyć domyślnego promptu dietetyka.",
     "save_prompt": "Zapisz prompt",
+    "reset_prompt": "Reset",
     "ai_engine_label": "Silnik AI",
+    "engine_gemini": "Gemini API",
+    "engine_ollama": "Ollama (lokalny)",
+    "gemini_model_label": "Model Gemini",
     "gemini_key_label": "Klucz Gemini API",
     "gemini_key_placeholder": "AIza... (zostaw puste aby użyć zmiennej środowiskowej)",
     "gemini_key_hint": "Opcjonalne. Nadpisuje zmienną środowiskową GEMINI_API_KEY.",
+    "ollama_url_label": "Ollama URL",
+    "ollama_model_label": "Model Ollama",
+    "ollama_loading": "Ładowanie modeli...",
+    "ollama_no_models": "Brak modeli",
+    "ollama_unavailable": "Ollama niedostępna",
+    "ollama_available": "Dostępna ({count} modeli)",
+    "ollama_error": "Błąd połączenia",
+    "ollama_error_detail": "Błąd połączenia z Ollama",
     "connections_title": "Połączenie z Grocy",
     "grocy_url_label": "Adres Grocy",
     "grocy_url_placeholder": "http://192.168.1.100:9283",
@@ -124,11 +147,16 @@
     "grocy_key_placeholder": "Twój klucz API Grocy",
     "grocy_key_hint": "Znajdź klucz w Grocy → Zarządzaj kluczami API.",
     "save": "Zapisz",
+    "save_error": "Błąd zapisu.",
     "test_connection": "Testuj połączenie",
+    "testing": "Testowanie...",
     "connected": "Połączono",
+    "connected_to": "Połączono z {url}",
     "not_configured": "Nie skonfigurowano",
     "cannot_connect": "Nie można połączyć. Sprawdź adres i klucz API.",
     "connection_test_failed": "Test połączenia nie powiódł się.",
+    "appearance_label": "Wygląd",
+    "theme_light": "Jasny motyw",
     "user_title_edit": "Edytuj profil",
     "user_title_new": "Nowy użytkownik",
     "user_name_placeholder": "Imię użytkownika...",
@@ -139,14 +167,7 @@
     "user_add": "Dodaj",
     "user_delete": "Usuń",
     "user_delete_confirm": "Usunąć tego użytkownika? Wszystkie jego sesje zostaną też usunięte.",
-    "saved": "Zapisano",
-    "appearance": "Wygląd",
-    "light_theme": "Jasny motyw",
-    "loading_models": "Ładowanie modeli...",
-    "no_models": "Brak modeli",
-    "ollama_unavailable": "Ollama niedostępna",
-    "ollama_available": "Dostępna ({count} modeli)",
-    "ollama_connection_error": "Błąd połączenia z Ollama"
+    "saved": "Zapisano"
   },
   "units": {
     "pcs": "szt.",
@@ -154,48 +175,9 @@
     "ml": "ml",
     "tbsp": "łyżka",
     "tsp": "łyżeczka",
-    "pinch": "szczypta"
-  },
-  "meal_types": {
-    "sniadanie": "Śniadanie",
-    "obiad": "Obiad",
-    "kolacja": "Kolacja",
-    "przekaska": "Przekąska"
-  },
-  "tool_calls": {
-    "get_recipes": "Sprawdzam przepisy",
-    "get_stock": "Sprawdzam spiżarnię",
-    "get_products": "Sprawdzam produkty",
-    "save_recipe": "Zapisuję przepis",
-    "add_ingredient_to_recipe": "Dodaję składnik",
-    "add_to_shopping_list": "Dodaję do listy zakupów",
-    "get_shopping_list": "Pobieram listę zakupów",
-    "get_meal_plan": "Sprawdzam plan posiłków",
-    "save_meal_plan_entry": "Zapisuję plan posiłków",
-    "update_memory": "Zapamiętuje informację",
-    "get_memory": "Wczytuję pamięć",
-    "get_recipe_details": "Pobieram szczegóły przepisu"
-  },
-  "theme": {
-    "toggle_light": "Włącz jasny motyw",
-    "toggle_dark": "Włącz ciemny motyw"
-  },
-  "tts": {
-    "disable": "Wyłącz odczyt głosowy",
-    "enable": "Czytaj głośno"
-  },
-  "stt": {
-    "dictate": "Dyktuj",
-    "stop_dictate": "Zatrzymaj dyktowanie"
-  },
-  "session": {
-    "today": "Dziś",
-    "yesterday": "Wczoraj",
-    "delete_session": "Usuń rozmowę"
-  },
-  "user_select": {
-    "title": "Kim jesteś?",
-    "select_prompt": "Wybierz profil, żeby dietetyk znał Twoje preferencje."
+    "pinch": "szczypta",
+    "kg": "kg",
+    "l": "l"
   },
   "common": {
     "cancel": "Anuluj",
@@ -215,5 +197,43 @@
     "label": "Język",
     "en": "English",
     "pl": "Polski"
+  },
+  "user_select": {
+    "title": "Kim jesteś?",
+    "hint": "Wybierz profil, żeby dietetyk znał Twoje preferencje.",
+    "select_user": "Wybierz użytkownika"
+  },
+  "theme": {
+    "light": "Jasny",
+    "dark": "Ciemny",
+    "enable_light": "Włącz jasny motyw",
+    "enable_dark": "Włącz ciemny motyw"
+  },
+  "mic": {
+    "dictate": "Dyktuj",
+    "stop_dictation": "Zatrzymaj dyktowanie"
+  },
+  "tts": {
+    "disable": "Wyłącz odczyt głosowy",
+    "enable": "Czytaj głośno"
+  },
+  "tools": {
+    "get_recipes": "Sprawdzam przepisy",
+    "get_stock": "Sprawdzam spiżarnię",
+    "get_products": "Sprawdzam produkty",
+    "save_recipe": "Zapisuję przepis",
+    "add_ingredient_to_recipe": "Dodaję składnik",
+    "add_to_shopping_list": "Dodaję do listy zakupów",
+    "get_shopping_list": "Pobieram listę zakupów",
+    "get_meal_plan": "Sprawdzam plan posiłków",
+    "save_meal_plan_entry": "Zapisuję plan posiłków",
+    "update_memory": "Zapamiętuje informację",
+    "get_memory": "Wczytuję pamięć",
+    "get_recipe_details": "Pobieram szczegóły przepisu"
+  },
+  "sessions": {
+    "delete_tooltip": "Usuń rozmowę",
+    "today": "Dziś",
+    "yesterday": "Wczoraj"
   }
 }
